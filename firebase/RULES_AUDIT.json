@@ -1,5 +1,5 @@
 {
   "score": 5,
-  "summary": "Static review: owner UID and verified Google identity guard every diary operation. Exact fields, size and type checks, server timestamps and increasing versions constrain creates and updates. Admin authority comes from owner-provisioned ACL documents which clients cannot write. Emulator verification remains pending; this score describes static review only.",
+  "summary": "Owner UID and verified Google identity guard every diary operation. Exact fields, size and type checks, server timestamps and increasing versions constrain creates and updates. Admin authority comes from owner-provisioned ACL documents which clients cannot write. Static review and all six emulator security tests passed on 2026-11-14; the matching rules were published to the designated project.",
   "findings": []
 }

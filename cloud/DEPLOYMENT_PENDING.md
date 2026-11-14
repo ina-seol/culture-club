@@ -1,11 +1,16 @@
-# 공개 버전 준비 상태
+# 공개 버전 배포 기록
 
-대상 Firebase: dddd-77ad2 / 공개 저장소: ina-seol/culture-club.
+2026-11-14 배포 완료. 이 파일 이름은 초기 준비 단계에서 사용한 이름을 유지한다.
 
-완료: Firebase 웹 앱 등록, 서울 리전 Firestore 생성(현재 deny-all), Google 로그인 활성화, ina-seol.github.io 승인 도메인 등록, Google 로그인·사용자별 일기 클라이언트 코드와 규칙·테스트 작성, Pages 하위 경로 대응, 로컬 앱 빌드 검증.
+- 사이트: https://ina-seol.github.io/culture-club/
+- 저장소: https://github.com/ina-seol/culture-club
+- Firebase: dddd-77ad2, Firestore Standard / 서울 asia-northeast3
+- Google 로그인 활성화 및 ina-seol.github.io 승인 도메인 등록 완료.
+- 사용자별 일기 규칙을 에뮬레이터로 검증한 뒤 콘솔에 원문 대조·게시 완료.
+- 프로젝트 소유자가 승인한 Google 사용자의 UID로 관리자 ACL 설정 완료. 관리자 이메일·UID는 소스에 넣지 않는다.
+- 실제 공개 사이트에서 Google 로그인, 관리자 화면, 일기 저장, 새로고침 후 조회, 휴지통 이동, 로그아웃을 확인했다. 가상 검증 기록 한 편은 휴지통에 보관했다.
+- 허브·일기 로컬 API 테스트 11개, Firestore 보안 규칙 테스트 6개 통과. 클라우드 타입 검사·빌드 및 운영 의존성 감사 통과.
+- Pages 하위 경로의 이미지·해시 경로·공유용 영어교실 위젯 정상 열림 확인.
+- 기존 로컬 DB와 일기는 업로드하거나 자동 이전하지 않았다.
 
-대기: SDK 설치, 클라우드 타입 검사, Firestore 규칙 에뮬레이터 검증, 검증된 규칙 배포, GitHub 소스 업로드와 Pages 배포, 실제 Google 로그인과 계정별 저장 확인.
-
-패키지 설치는 자동 승인 검토의 사용량 제한으로 실행되지 않았다. 이 제한이 해제된 뒤 검증을 이어간다. 검증 전에는 클라우드 앱을 배포하지 않는다. 기존 로컬 앱과 로컬 DB는 보존한다. 기존 일기를 Firebase로 자동 이전하지 않는다.
-
-관리자 권한은 프로젝트 소유자가 Google 사용자 UID를 확인한 뒤 cultureClubAdmins/{uid}에 active: true를 등록하는 방식이다. 브라우저 앱에서 관리자 권한을 만들 수 없다.
+보안 규칙은 콘솔에 게시했다. firestore.indexes.json의 본문 인덱싱 제외는 별도 운영 최적화 설정이며, 현재 쿼리는 기본 단일 필드 색인으로 동작한다. 이 인덱싱 제외 설정의 운영 반영은 확인하지 않았다.

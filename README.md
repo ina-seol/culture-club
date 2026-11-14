@@ -4,9 +4,13 @@
 
 세계문화 탐험은 3·4·5·6학년 각각 크리스마스·할로윈·미국 추수감사절을 다룹니다. 문화 읽기 → 영어 표현 3개 → 선택형 퀴즈 5문항으로 구성되며 학생 이름·학번·답안·점수를 수집하지 않습니다. 학습과 채점은 프론트엔드에서 작동합니다.
 
-## 공개 버전 준비 상태
+## 공개 버전
 
-공개 저장소는 `ina-seol/culture-club`, Firebase 프로젝트는 `dddd-77ad2`입니다. Google 로그인 공급자와 Pages 도메인을 설정했습니다. 클라우드 코드·보안 규칙·배포 워크플로를 준비 중입니다. **배포와 실제 로그인 검증은 아직 완료하지 않았습니다.** 자세한 진행 상태는 `cloud/DEPLOYMENT_PENDING.md`에 기록합니다.
+공개 사이트: https://ina-seol.github.io/culture-club/
+
+저장소: https://github.com/ina-seol/culture-club
+
+Firebase 프로젝트는 `dddd-77ad2`입니다. Pages 배포, Google 로그인, 관리자 화면, 실제 일기 저장·새로고침 조회·휴지통 이동·로그아웃을 확인했습니다. 배포 기록은 `cloud/DEPLOYMENT_PENDING.md`, 보안 검토와 제한은 `SECURITY_REVIEW.md`에 기록합니다.
 
 GitHub Pages는 화면과 이미지를 제공하고, Firebase Authentication과 Firestore는 로그인과 일기 저장을 담당합니다. 공개 사이트에 로컬 Node 서버나 SQLite를 올리지 않습니다. 기존 로컬 일기와 백업은 Firebase로 자동 이전하지 않습니다.
 
@@ -31,7 +35,7 @@ npm start
 
 ## Firebase·Pages 빌드
 
-SDK 설치와 보안 규칙 검증을 완료한 뒤 다음 명령을 사용합니다.
+다음 명령으로 보안 규칙을 검증하고 공개 버전을 빌드합니다.
 
 ```sh
 npm run test:rules
