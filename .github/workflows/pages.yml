@@ -1,7 +1,7 @@
 name: Verify and deploy Pages
 on:
   push:
-    branches: [main]
+    branches: [main, codex/firebase-pages]
   workflow_dispatch:
 permissions:
   contents: read
@@ -30,6 +30,7 @@ jobs:
         with:
           path: dist
   deploy:
+    if: github.ref == 'refs/heads/main'
     needs: build
     runs-on: ubuntu-latest
     permissions:

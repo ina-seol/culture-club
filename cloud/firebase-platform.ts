@@ -54,7 +54,11 @@ export function createFirebasePlatform(config:FirebaseWebConfig){
   if(url.pathname==='/programs'&&method==='GET'){
    const [snapshot,meta]=await Promise.all([getDocs(collection(db,'cultureClubPrograms')),getDoc(doc(db,'cultureClubPublic','site'))]);
    if(!meta.exists()&&snapshot.empty)return {programs:DEFAULT_PROGRAMS};
-   return {programs:snapshot.docs.map(d=>({id:d.id,...d.data()})).sort((a:any,b:any)=>(a.createdAt?.toMillis?.()||0)-(b.createdAt?.toMillis?.()||0))};
+   const position=new Map(DEFAULT_PROGRAMS.map((p,i)=>[p.id,i]));
+   return {programs:snapshot.docs.map(d=>({id:d.id,...d.data()})).sort((a:any,b:any)=>{
+    const rank=(position.get(a.id)??10000)-(position.get(b.id)??10000);
+    return rank||(a.createdAt?.toMillis?.()||0)-(b.createdAt?.toMillis?.()||0)||a.id.localeCompare(b.id);
+   })};
   }
   if(url.pathname.startsWith('/programs')&&['POST','PUT','DELETE'].includes(method)){
    if(!await isAdmin())fail('프로그램 관리는 허용된 교사 계정만 할 수 있어요.',403);
