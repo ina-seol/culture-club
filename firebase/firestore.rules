@@ -1,0 +1,80 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function googleUser() {
+      return request.auth != null
+        && request.auth.token.email_verified == true
+        && request.auth.token.firebase.sign_in_provider == 'google.com';
+    }
+    function admin() {
+      return googleUser()
+        && exists(/databases/$(database)/documents/cultureClubAdmins/$(request.auth.uid))
+        && get(/databases/$(database)/documents/cultureClubAdmins/$(request.auth.uid)).data.active == true;
+    }
+    function validEntry(d) {
+      return d.keys().hasAll(['entryDate', 'title', 'content', 'mood', 'version', 'createdAt', 'updatedAt', 'deletedAt'])
+        && d.keys().hasOnly(['entryDate', 'title', 'content', 'mood', 'version', 'createdAt', 'updatedAt', 'deletedAt'])
+        && d.entryDate is string && d.entryDate.matches('^(19[0-9]{2}|20[0-9]{2}|21[0-9]{2})-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$')
+        && d.title is string && d.title.size() > 0 && d.title.size() <= 120
+        && d.content is string && d.content.size() > 0 && d.content.size() <= 20000
+        && d.mood in ['happy', 'calm', 'excited', 'tired', 'sad']
+        && d.version is int && d.version > 0
+        && d.createdAt is timestamp && d.updatedAt is timestamp
+        && (d.deletedAt == null || d.deletedAt is timestamp);
+    }
+    match /cultureClubDiaries/{uid}/entries/{entryId} {
+      allow read: if googleUser() && request.auth.uid == uid;
+      allow create: if googleUser() && request.auth.uid == uid
+        && validEntry(request.resource.data)
+        && request.resource.data.version == 1
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.updatedAt == request.time
+        && request.resource.data.deletedAt == null;
+      allow update: if googleUser() && request.auth.uid == uid
+        && validEntry(request.resource.data)
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.updatedAt == request.time
+        && request.resource.data.version == resource.data.version + 1
+        && (
+          (resource.data.deletedAt == null && request.resource.data.deletedAt == null)
+          || (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['deletedAt', 'updatedAt', 'version'])
+            && ((resource.data.deletedAt == null && request.resource.data.deletedAt == request.time)
+              || (resource.data.deletedAt is timestamp && request.resource.data.deletedAt == null)))
+        );
+      allow delete: if false;
+    }
+    match /cultureClubAdmins/{uid} {
+      // Provisioning requires project-owner IAM access. Browser clients cannot grant admin access.
+      allow get: if googleUser() && request.auth.uid == uid;
+      allow list, write: if false;
+    }
+    function validProgram(d, id) {
+      return d.keys().hasAll(['title', 'description', 'url', 'createdAt', 'updatedAt'])
+        && d.keys().hasOnly(['title', 'description', 'url', 'createdAt', 'updatedAt'])
+        && d.title is string && d.title.size() > 0 && d.title.size() <= 60
+        && d.description is string && d.description.size() > 0 && d.description.size() <= 200
+        && d.url is string && d.url.size() <= 2000
+        && (d.url.matches('^https://[^/@]+(/.*)?$')
+          || (id == 'culture' && d.url == '/culture')
+          || (id == 'diary' && d.url == '/diary')
+          || (id == 'classroom' && d.url == '/widgets/english-classroom.html'))
+        && d.createdAt is timestamp && d.updatedAt == request.time;
+    }
+    match /cultureClubPrograms/{id} {
+      allow read: if true;
+      allow create: if admin() && validProgram(request.resource.data, id)
+        && request.resource.data.createdAt == request.time;
+      allow update: if admin() && validProgram(request.resource.data, id)
+        && request.resource.data.createdAt == resource.data.createdAt;
+      allow delete: if admin();
+    }
+    match /cultureClubPublic/site {
+      allow read: if true;
+      allow create, update: if admin()
+        && request.resource.data.keys().hasOnly(['initialized'])
+        && request.resource.data.initialized == true;
+      allow delete: if false;
+    }
+    match /{document=**} { allow read, write: if false; }
+  }
+}

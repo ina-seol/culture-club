@@ -1,0 +1,2710 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#efe7e0" />
+<title>나의 영어교실 · 컬처클럽</title>
+<style>
+@font-face { font-family:'Escoredream'; src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-1Thin.woff') format('woff'); font-weight:100; font-style:normal; font-display:swap; }
+@font-face { font-family:'Escoredream'; src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-2ExtraLight.woff') format('woff'); font-weight:200; font-style:normal; font-display:swap; }
+@font-face { font-family:'Escoredream'; src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-3Light.woff') format('woff'); font-weight:300; font-style:normal; font-display:swap; }
+@font-face { font-family:'Escoredream'; src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-4Regular.woff') format('woff'); font-weight:400; font-style:normal; font-display:swap; }
+@font-face { font-family:'Escoredream'; src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-5Medium.woff') format('woff'); font-weight:500; font-style:normal; font-display:swap; }
+@font-face { font-family:'Escoredream'; src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-6Bold.woff') format('woff'); font-weight:600; font-style:normal; font-display:swap; }
+@font-face { font-family:'Escoredream'; src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-7ExtraBold.woff') format('woff'); font-weight:700; font-style:normal; font-display:swap; }
+@font-face { font-family:'Escoredream'; src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-8Heavy.woff') format('woff'); font-weight:800; font-style:normal; font-display:swap; }
+@font-face { font-family:'Escoredream'; src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-9Black.woff') format('woff'); font-weight:900; font-style:normal; font-display:swap; }
+/* DODAM · macOS-inspired classroom. Presentation only; application logic is unchanged. */
+:root {
+  --honeydew:#f5f7fb; --celadon:#e4efff; --yellow-green:#fff0bf;
+  --fern:#3879d7; --dark-khaki:#1d283c; --paper:rgba(255,255,255,.84);
+  --ink:#1d283c; --muted:#65738a; --accent:#0877f9; --accent-soft:#e8f1ff;
+  --line:rgba(68,89,126,.13); --surface:rgba(255,255,255,.85);
+  --shadow:0 8px 28px rgba(35,58,100,.07),0 1px 3px rgba(35,58,100,.04);
+  --pixel:1px; --gap:clamp(10px,.7vw,24px); --radius-cut:clamp(14px,1vw,30px);
+  --screen-brightness:1;
+  /* Each chrome row is 50px shorter than the original desktop layout. */
+  --header-h:calc(clamp(106px,7.2vh,164px) - 50px);
+  --dock-h:calc(clamp(118px,10.2vh,196px) - 50px);
+}
+* { box-sizing:border-box; }
+html,body { width:100%;height:100%;margin:0;overflow:hidden; }
+body {
+  font-family:'Escoredream',sans-serif;font-weight:400;color:var(--ink);
+  background:radial-gradient(ellipse at 9% 5%,#cee3ff 0,transparent 44%),radial-gradient(ellipse at 92% 90%,#dddaf5 0,transparent 44%),linear-gradient(135deg,#edf3fc,#f5f5fa 55%,#e5edfa);
+  filter:brightness(var(--screen-brightness));user-select:none;-webkit-user-select:none;overscroll-behavior:none;
+  -webkit-font-smoothing:antialiased;
+}
+button,input,textarea,select { font-family:'Escoredream',sans-serif;font-size:inherit;color:inherit; }
+input,textarea { user-select:text;-webkit-user-select:text; }
+button,.seat,.menu-item { touch-action:manipulation;-webkit-tap-highlight-color:transparent; }
+button { cursor:pointer; }
+button:disabled { cursor:default;opacity:.45; }
+:focus-visible { outline:3px solid #2485ff;outline-offset:3px; }
+button,input,textarea,select { accent-color:var(--accent); }
+* { scrollbar-width:thin;scrollbar-color:#b0bacb transparent; }
+.pixel-cut { clip-path:none;border-radius:var(--radius-cut); }
+.app-shell { position:relative;width:100vw;height:100vh;height:100dvh;min-width:0;display:grid;grid-template-rows:var(--header-h) minmax(0,1fr) var(--dock-h);gap:var(--gap);padding:var(--gap); }
+.topbar,.dock { background:rgba(250,252,255,.72);border:1px solid rgba(255,255,255,.94);box-shadow:var(--shadow);backdrop-filter:blur(22px) saturate(1.3);-webkit-backdrop-filter:blur(22px) saturate(1.3); }
+.topbar { min-width:0;display:grid;grid-template-columns:minmax(160px,.85fr) minmax(0,1.6fr) minmax(270px,1fr);align-items:center;gap:var(--gap);border-radius:var(--radius-cut);padding:0 clamp(12px,1vw,30px); }
+.top-status,.brand-panel,.header-actions { min-width:0;height:100%;background:transparent;border:0;box-shadow:none; }
+.top-status { display:flex;align-items:center;gap:clamp(10px,.85vw,28px); }
+.status-gem { flex:0 0 auto;width:52px;height:12px;background:radial-gradient(circle at 6px 6px,#ff5f57 0 5px,#e84d48 5px 6px,transparent 6px),radial-gradient(circle at 26px 6px,#febc2e 0 5px,#dfa123 5px 6px,transparent 6px),radial-gradient(circle at 46px 6px,#28c840 0 5px,#20aa34 5px 6px,transparent 6px); }
+.status-copy { min-width:0; }
+.eyebrow { font-size:clamp(8px,.52vw,18px);font-weight:500;letter-spacing:.13em;color:var(--muted);white-space:nowrap; }
+.status-main { margin-top:3px;font-size:clamp(12px,.85vw,29px);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+.brand-panel { display:grid;place-items:center;padding:0; }
+.class-title { font-size:clamp(16px,1.35vw,45px);font-weight:600;letter-spacing:.015em;white-space:nowrap;text-align:center; }
+.header-actions { display:flex;align-items:center;justify-content:flex-end;gap:clamp(12px,1.1vw,34px); }
+.header-clock { min-width:0;text-align:right; }
+.header-time { font-size:clamp(14px,1vw,34px);font-weight:500;line-height:1.15;font-variant-numeric:tabular-nums;white-space:nowrap; }
+.header-date { margin-top:3px;font-size:clamp(9px,.55vw,19px);color:var(--muted);white-space:nowrap; }
+.icon-stack { display:flex;gap:clamp(5px,.4vw,14px); }
+.pixel-btn,.class-tab,.settings-tab { border:1px solid var(--line);background:linear-gradient(#fff,#f7f9fc);box-shadow:0 1px 2px rgba(27,49,83,.06);min-height:clamp(44px,3vw,88px);padding:.65em 1em;border-radius:clamp(9px,.7vw,22px);font-weight:500;font-size:clamp(14px,.9vw,29px);transition:background .15s,box-shadow .15s,transform .15s; }
+.pixel-btn:hover,.class-tab:hover,.settings-tab:hover { background:var(--accent-soft);border-color:#adcbf7; }
+.pixel-btn:active,.dock-btn:active { transform:scale(.98); }
+.pixel-btn.active,.class-tab.active,.settings-tab.active,.workspace-preset.active { background:var(--accent);color:white;border-color:transparent;box-shadow:0 3px 8px rgba(8,119,249,.16); }
+.icon-btn { width:clamp(38px,2.8vw,80px);min-height:0;height:clamp(38px,2.8vw,80px);display:grid;place-items:center;padding:0;font-size:clamp(20px,1.3vw,42px); }
+.icon-inner { display:grid;place-items:center; }
+.icon-label { display:none; }
+.main-stage { position:relative;min-width:0;min-height:0;overflow:hidden;border-radius:clamp(18px,1.3vw,40px);box-shadow:var(--shadow); }
+.game-screen { position:absolute;inset:0;overflow:hidden;border:1px solid rgba(255,255,255,.95);background:rgba(246,249,254,.76);border-radius:inherit; }
+.view { position:absolute;inset:0;z-index:2;visibility:hidden;opacity:0;pointer-events:none;transform:translateY(4px);transition:opacity .18s,transform .18s,visibility .18s; }
+.view.active { visibility:visible;opacity:1;pointer-events:auto;transform:none; }
+.mini-card,.clock-card,.timer-display-card,.timer-side-panel,.quest-list,.cleanup-display,.class-selector,.desk-grid,.workspace-card { background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);border-radius:var(--radius-cut); }
+/* Home */
+.home-view { display:grid;grid-template-columns:minmax(190px,.68fr) minmax(0,2.3fr) minmax(230px,.85fr);gap:clamp(14px,1.2vw,38px);padding:clamp(18px,1.5vw,48px); }
+.home-side { min-height:0;display:flex;flex-direction:column;gap:clamp(12px,.9vw,28px);overflow:auto; }
+.mini-card { padding:clamp(16px,1.1vw,34px); }
+.mini-title { font-size:clamp(12px,.88vw,28px);font-weight:600;letter-spacing:.06em; }
+.mini-copy { margin-top:.75em;font-size:clamp(13px,.85vw,28px);line-height:1.75;color:var(--muted); }
+.home-side.left .mini-card:first-child { background:linear-gradient(135deg,#f6faff,#e4efff); }
+#homeClassLabel { font-size:clamp(17px,1.25vw,42px);color:#3161a3;font-weight:500; }
+.home-center { min-height:0;min-width:0;display:grid;align-items:center; }
+.clock-card { width:100%;max-height:100%;overflow:auto;text-align:center;padding:clamp(28px,3.2vw,100px) clamp(18px,2vw,64px);background:linear-gradient(155deg,rgba(255,255,255,.98),rgba(242,247,255,.82)); }
+.clock-kicker { font-size:clamp(12px,.85vw,28px);font-weight:500;letter-spacing:.22em;color:var(--muted); }
+.main-clock { margin-top:.35em;font-size:clamp(48px,6.1vw,230px);font-weight:300;line-height:1.2;white-space:nowrap;letter-spacing:-.055em;font-variant-numeric:tabular-nums;color:#24395f; }
+.main-date { margin-top:clamp(10px,1vw,30px);font-size:clamp(17px,1.4vw,48px);font-weight:400;color:var(--muted); }
+.dialog-box { display:grid;place-items:center;min-height:clamp(86px,10vh,220px);margin-top:clamp(26px,3.3vw,110px);padding:1em 1.2em;background:rgba(231,240,255,.72);border:1px solid #dbe7f7;font-size:clamp(18px,1.6vw,54px);line-height:1.6;color:#365b91; }
+.leaf-pixel { margin-top:auto;min-height:clamp(90px,12vh,270px);display:grid;place-items:center;font-size:clamp(40px,4.5vw,150px);font-weight:300;color:#689de3;background:linear-gradient(135deg,#eaf2ff,#e9e7fa);border:1px solid rgba(255,255,255,.8); }
+.home-side.right > .leaf-pixel { display:none; }
+.music-card-shell { min-height:min-content; }
+.music-grid { margin-top:1em;display:grid;gap:clamp(7px,.5vw,16px); }
+.music-track { display:grid;gap:.3em;text-align:left;justify-items:start;padding:.7em .9em;min-height:clamp(48px,3.4vw,108px); }
+.music-track-main { font-size:clamp(13px,.9vw,30px);font-weight:500;line-height:1.3; }
+.music-track-sub { font-size:clamp(9px,.58vw,20px);opacity:.7;letter-spacing:.05em; }
+.music-track.paused-track { opacity:.72; }
+.music-actions-row { display:flex;justify-content:flex-end;margin-top:.7em; }
+.mini-action-btn { min-height:clamp(34px,2.2vw,70px);font-size:clamp(12px,.75vw,24px);padding:.5em .9em; }
+.music-status { font-size:clamp(11px,.68vw,23px);line-height:1.6;margin-top:.6em; }
+/* Shared screen headings, timers and cleanup */
+.timer-view,.cleanup-view { display:grid;grid-template-rows:auto minmax(0,1fr) auto;gap:clamp(14px,1vw,32px);padding:clamp(18px,1.5vw,48px); }
+.timer-view { grid-template-rows:auto minmax(0,1fr); }
+.screen-heading-row { display:flex;align-items:center;justify-content:space-between;gap:var(--gap); }
+.screen-heading { font-size:clamp(25px,2.4vw,82px);font-weight:600;letter-spacing:-.03em;line-height:1.2; }
+.screen-subtitle { margin-top:.45em;font-size:clamp(13px,.9vw,30px);color:var(--muted); }
+.timer-state-badge { padding:.6em 1.1em;background:var(--accent-soft);color:#2465b6;border:1px solid #c7dcf9;border-radius:100px;font-size:clamp(14px,1vw,34px);font-weight:500; }
+.timer-core { min-height:0;display:grid;grid-template-columns:minmax(0,2.7fr) minmax(240px,.75fr);gap:clamp(16px,1.2vw,38px); }
+.timer-display-card { display:grid;grid-template-rows:minmax(0,1fr) auto;min-width:0;min-height:0;padding:clamp(22px,2vw,64px); }
+.timer-number-wrap { display:grid;place-items:center;min-width:0;min-height:0; }
+.timer-number { font-weight:300;font-size:clamp(96px,min(17vw,29vh),570px);line-height:1.1;letter-spacing:-.065em;white-space:nowrap;font-variant-numeric:tabular-nums;color:#234879; }
+.timer-message { text-align:center;margin-top:.6em;font-size:clamp(18px,1.6vw,54px);min-height:1.45em;color:var(--muted); }
+.progress-label-row { display:flex;justify-content:space-between;margin-bottom:.6em;font-size:clamp(11px,.8vw,27px);color:var(--muted);font-weight:500; }
+.timer-progress { height:clamp(8px,.7vw,24px);background:#e8eef7;border-radius:100px;overflow:hidden; }
+.timer-progress-fill { height:100%;width:100%;background:linear-gradient(90deg,#8abaff,#287ff1);border-radius:inherit;transform-origin:left center;transition:width .22s linear; }
+.timer-side-panel { min-height:0;overflow:auto;display:flex;flex-direction:column;gap:clamp(12px,1vw,30px);padding:clamp(18px,1.4vw,44px); }
+.timer-side-title,.quest-title { font-size:clamp(17px,1.2vw,42px);font-weight:600; }
+.timer-side-title { padding-bottom:.8em;border-bottom:1px solid var(--line); }
+.timer-side-info { font-size:clamp(14px,.95vw,32px);line-height:1.7;color:var(--muted); }
+.control-grid { margin-top:auto;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(8px,.6vw,20px); }
+.control-grid .pixel-btn { padding:.65em .4em; }
+.wide-control-grid { display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:var(--gap); }
+.danger-state .timer-display-card { background:#fff1ef;border-color:#f6bdb6; }
+.danger-state .timer-number,.danger-state .timer-state-badge { color:#cb3b30; }
+.danger-state .timer-state-badge { background:#ffe6e3;border-color:#f2c1bc; }
+.cleanup-core { min-height:0;display:grid;grid-template-columns:minmax(220px,.8fr) minmax(0,2.2fr);gap:clamp(16px,1.2vw,38px); }
+.quest-list { padding:clamp(18px,1.5vw,48px);overflow:auto; }
+.quest-title { margin-bottom:1em; }
+.quest-step { display:grid;grid-template-columns:auto 1fr;align-items:center;gap:.6em;padding:.8em .7em;font-size:clamp(16px,1.15vw,38px);border-radius:12px;line-height:1.5; }
+.quest-step.active { background:var(--accent-soft);color:#1d65bd; }
+.quest-step.done { opacity:.5; }
+.quest-cursor { width:1.2em;text-align:center; }
+.cleanup-display { min-height:0;display:grid;grid-template-columns:minmax(120px,.65fr) minmax(0,2fr);gap:clamp(18px,1.6vw,50px);padding:clamp(24px,2vw,64px); }
+.cleanup-icon { min-width:0;display:grid;place-items:center;background:#e9f1fc;color:#4b87d6;font-size:clamp(50px,6vw,200px); }
+.cleanup-info { min-width:0;display:grid;align-content:center; }
+.cleanup-step-title { font-size:clamp(26px,3vw,110px);font-weight:600;line-height:1.3; }
+.cleanup-step-message { margin-top:.65em;font-size:clamp(15px,1.3vw,44px);line-height:1.7;color:var(--muted); }
+.cleanup-time { margin-top:.3em;font-size:clamp(70px,min(10vw,20vh),330px);font-weight:300;line-height:1.1;font-variant-numeric:tabular-nums;color:#2465b6; }
+/* Seating */
+.seating-view { display:grid;grid-template-columns:minmax(190px,.55fr) minmax(0,2.8fr);gap:clamp(14px,1.2vw,38px);padding:clamp(16px,1.2vw,38px); }
+.class-selector { min-height:0;display:flex;flex-direction:column;padding:clamp(14px,1vw,32px);overflow:auto; }
+.selector-title { font-size:clamp(14px,1vw,34px);font-weight:600;margin-bottom:1em; }
+.class-tabs { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(6px,.5vw,16px); }
+.class-tab { min-height:clamp(40px,2.8vw,90px);padding:.5em .3em; }
+.seating-tools { margin-top:auto;padding-top:1em;display:grid;gap:clamp(7px,.5vw,16px); }
+.seating-tools .pixel-btn { padding:.55em .4em; }
+.seat-stage { min-width:0;min-height:0;display:grid;grid-template-rows:auto minmax(0,1fr);gap:clamp(14px,1vw,32px); }
+.seat-head { display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:var(--gap); }
+.seat-class-title { font-size:clamp(18px,1.6vw,54px);font-weight:600;white-space:nowrap; }
+.blackboard { padding:.65em 1.4em;background:#e5edf9;color:#4e6e99;border:1px solid #d3dff1;font-size:clamp(12px,.95vw,32px);font-weight:500;letter-spacing:.04em; }
+.seat-count { text-align:right;font-size:clamp(12px,.9vw,30px);color:var(--muted); }
+.desk-grid { min-height:0;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));grid-template-rows:repeat(4,minmax(0,1fr));gap:clamp(10px,.9vw,28px);padding:clamp(14px,1.4vw,44px); }
+.seat { min-width:0;min-height:0;position:relative;display:grid;place-items:center;padding:10px;background:linear-gradient(160deg,#f5f9ff,#e9f1ff);border:1px solid #d3e1f5;box-shadow:0 3px 6px rgba(44,78,126,.05);border-radius:clamp(12px,.85vw,28px);overflow:hidden;cursor:pointer; }
+.seat:nth-child(6n+3),.seat:nth-child(6n+4) { background:linear-gradient(160deg,#f7f5ff,#eeebfa);border-color:#e0daf2; }
+.seat.empty { background:#f5f7fa;border-style:dashed;box-shadow:none;cursor:default; }
+.seat-number { position:absolute;left:10px;top:8px;font-size:clamp(10px,.65vw,22px);color:var(--muted); }
+.seat-name { max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:clamp(22px,1.9vw,70px);font-weight:500;line-height:1.4; }
+.seat.highlighted,.seat.move-selected { background:var(--accent);color:white;border-color:var(--accent);box-shadow:0 6px 16px #0877f930; }
+.seat.highlighted .seat-number,.seat.move-selected .seat-number { color:#dbeaff; }
+.seat.highlighted { animation:seatPulse .7s ease-in-out infinite alternate; }
+.desk-grid.has-highlight .seat:not(.highlighted) { opacity:.45; }
+.desk-grid.editing .seat { cursor:crosshair; }
+.seat.shuffling { animation:pixelShake .12s ease-in-out infinite alternate; }
+.seat-edit-hint { font-size:clamp(11px,.75vw,25px);line-height:1.7;color:var(--muted);padding:.8em;background:#edf3fc;border-radius:10px; }
+@keyframes seatPulse { to { box-shadow:0 0 0 5px #0877f92e; } }
+@keyframes pixelShake { from { transform:translate(-2px,-1px); } to { transform:translate(2px,1px); } }
+.student-focus { position:absolute;inset:0;z-index:25;display:none;place-items:center;background:rgba(26,39,64,.25);backdrop-filter:blur(12px); }
+.student-focus.show { display:grid; }
+.student-focus-card { min-width:min(72vw,1400px);padding:clamp(36px,4vw,140px);text-align:center;background:#f8fbff;border:1px solid white;box-shadow:0 24px 80px #16346030; }
+.student-focus-label { font-size:clamp(14px,1vw,34px);color:var(--muted);letter-spacing:.15em; }
+.student-focus-name { margin:.35em 0;font-size:clamp(70px,9vw,320px);font-weight:500;color:#2465b6; }
+.student-focus-close { min-width:150px; }
+/* Low-profile macOS dock */
+.dock { min-width:0;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:clamp(5px,.6vw,20px);padding:clamp(5px,.4vw,12px);border-radius:clamp(16px,1.2vw,36px); }
+.dock-btn { min-width:0;min-height:0;display:grid;grid-template-columns:auto auto;grid-template-rows:auto auto;align-content:center;justify-content:center;align-items:center;column-gap:clamp(8px,.7vw,22px);row-gap:3px;padding:4px 8px;background:transparent;border:1px solid transparent;border-radius:clamp(10px,.9vw,28px);transition:background .15s,transform .15s; }
+.dock-btn:hover { background:rgba(255,255,255,.8); }
+.dock-btn.active { background:rgba(255,255,255,.96);border-color:rgba(148,179,220,.25);box-shadow:0 3px 10px rgba(25,59,110,.08); }
+.dock-icon { grid-row:1/3;display:grid;place-items:center;width:clamp(34px,2.8vw,88px);height:clamp(34px,2.8vw,88px);border-radius:clamp(9px,.7vw,22px);background:linear-gradient(145deg,#57b6ff,#0877f9);color:white;box-shadow:inset 0 1px 1px #ffffff60,0 2px 4px #29476920; }
+.dock-icon svg { width:60%;height:60%;fill:none;stroke:currentColor;stroke-width:1.65;stroke-linecap:round;stroke-linejoin:round; }
+.dock-btn[data-action="randomPicker"] .dock-icon { background:linear-gradient(145deg,#b092fb,#8455db); }
+.dock-btn[data-action="customTimer"] .dock-icon { background:linear-gradient(145deg,#ffba64,#f18739); }
+.dock-btn[data-action="seating"] .dock-icon { background:linear-gradient(145deg,#6eceb1,#23a880); }
+.dock-btn[data-action="notice"] .dock-icon { background:linear-gradient(145deg,#ffd775,#edb336); }
+.dock-btn[data-action="home"] .dock-icon { background:linear-gradient(145deg,#85a7f4,#5278c9); }
+.dock-btn[data-action="fullscreen"] .dock-icon { background:linear-gradient(145deg,#a9b6cd,#7587a5); }
+.dock-label { min-width:0;align-self:end;font-size:clamp(12px,.95vw,32px);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:left; }
+.dock-sub { align-self:start;font-size:clamp(8px,.5vw,17px);letter-spacing:.1em;color:var(--muted);text-align:left; }
+/* Multi view: retain every preset, maximize the clipboard canvas. */
+.workspace-view { display:grid;grid-template-rows:auto minmax(0,1fr);gap:clamp(12px,.85vw,26px);padding:clamp(14px,1.05vw,34px); }
+.workspace-toolbar { display:flex;align-items:center;gap:clamp(6px,.5vw,16px);min-width:0;flex-wrap:wrap; }
+.workspace-title { margin-right:auto;font-size:clamp(18px,1.4vw,46px);font-weight:600;letter-spacing:-.025em; }
+.workspace-toolbar .pixel-btn { min-height:clamp(38px,2.6vw,78px);font-size:clamp(12px,.82vw,28px);padding:.65em .95em;border-radius:100px;white-space:nowrap; }
+.workspace-grid { min-width:0;min-height:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(12px,.9vw,28px); }
+.workspace-grid:has(.workspace-image-board) { grid-template-columns:minmax(0,2.35fr) minmax(260px,1fr); }
+.workspace-card { min-width:0;min-height:0;overflow:hidden;display:flex;flex-direction:column;padding:clamp(16px,1.2vw,38px); }
+.workspace-card-title { flex-shrink:0;margin-bottom:clamp(14px,1vw,30px);font-size:clamp(14px,1.05vw,36px);font-weight:600;letter-spacing:.06em;color:#42516a;line-height:1.4; }
+.workspace-card:has(.workspace-image-board) { display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto minmax(0,1fr);gap:clamp(10px,.8vw,24px);padding:clamp(10px,.75vw,24px); }
+.workspace-card:has(.workspace-image-board) .workspace-card-title { margin:0;align-self:center;padding-left:clamp(5px,.4vw,12px);font-size:clamp(13px,.95vw,32px); }
+.workspace-image-actions { min-width:0;display:flex;align-items:center;gap:clamp(6px,.45vw,14px); }
+.workspace-image-actions .pixel-btn { min-height:clamp(36px,2.4vw,70px);font-size:clamp(12px,.78vw,26px);padding:.6em .9em; }
+.workspace-image-paste { background:var(--accent);color:white;border-color:var(--accent); }
+.workspace-image-paste:hover { background:#0868dc;color:white; }
+.workspace-image-board { grid-column:1/-1;position:relative;min-width:0;min-height:0;overflow:hidden;display:grid;place-items:center;cursor:copy;border:1.5px dashed #bad0ed;border-radius:clamp(10px,.75vw,24px);background:radial-gradient(circle,#d8e3f3 1px,transparent 1px) 0 0/22px 22px,#f7faff;outline:none; }
+.workspace-image-board:focus { border-style:solid;border-color:var(--accent);box-shadow:inset 0 0 0 2px #0877f91a; }
+.workspace-image-board:has(img) { background:#fff;border:1px solid #dde6f1; }
+.workspace-image-board img { position:absolute;inset:0;width:100%;height:100%;max-width:100%;max-height:100%;object-fit:contain;display:block; }
+.workspace-image-empty { max-width:90%;text-align:center;font-size:clamp(13px,1.1vw,36px);line-height:1.9;color:var(--muted);font-weight:400; }
+.workspace-image-empty::before { content:'+';display:grid;place-items:center;width:clamp(52px,4vw,128px);height:clamp(52px,4vw,128px);margin:0 auto .55em;border-radius:clamp(16px,1.3vw,40px);background:#e4efff;color:#5796e6;font-size:clamp(30px,2.5vw,80px);font-weight:200;line-height:1; }
+.workspace-image-empty strong { display:block;color:#416ba5;font-weight:500;font-size:1.35em;margin-bottom:.3em; }
+.workspace-image-note { margin-top:.8em;font-size:.8em;opacity:.85; }
+.workspace-timer-number,.workspace-random-result { flex:1;min-height:0;min-width:0;display:grid;place-items:center;text-align:center;font-size:clamp(56px,7vw,240px);font-weight:300;color:#2860a6;line-height:1.15;letter-spacing:-.055em;font-variant-numeric:tabular-nums; }
+.workspace-random-result { font-weight:500;font-size:clamp(48px,5.6vw,190px); }
+.workspace-timer-meta,.workspace-random-meta { text-align:center;font-size:clamp(12px,.9vw,30px);color:var(--muted);line-height:1.8; }
+.workspace-timer-actions,.workspace-random-actions { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(8px,.6vw,20px); }
+.workspace-random-actions { grid-template-columns:repeat(3,minmax(0,1fr)); }
+.workspace-timer-actions .pixel-btn,.workspace-random-actions .pixel-btn { font-size:clamp(12px,.85vw,28px);min-height:clamp(42px,3vw,92px);padding:.6em .35em; }
+.workspace-timer-setup { background:var(--accent-soft);color:#2465b6; }
+.workspace-timer-stop { color:#c74b43; }
+.workspace-seat-grid { min-height:0;flex:1;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));grid-template-rows:repeat(4,minmax(0,1fr));gap:clamp(5px,.45vw,14px); }
+.workspace-seat { min-width:0;min-height:0;padding:3px;border:1px solid #d6e3f5;background:#edf4ff;border-radius:clamp(8px,.6vw,18px);font-size:clamp(14px,1.2vw,42px);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+.workspace-seat:nth-child(6n+3),.workspace-seat:nth-child(6n+4) { background:#f0edf9;border-color:#e2dcf2; }
+.workspace-seat:disabled { opacity:.4;background:#f4f6fa; }
+.workspace-grid:has(.workspace-image-board) #workspacePanelB { container-type:inline-size; }
+.workspace-grid:has(.workspace-image-board) .workspace-timer-number { font-size:clamp(45px,20cqw,260px); }
+.workspace-grid:has(.workspace-image-board) .workspace-seat { font-size:clamp(11px,4cqw,36px); }
+.workspace-notice-form { flex:1;min-height:0;display:grid;grid-template-rows:auto minmax(0,1fr) auto;gap:clamp(12px,.8vw,24px); }
+.workspace-notice-form input,.workspace-notice-form textarea { min-width:0;min-height:0;width:100%;padding:.8em;border:1px solid #d3ddec;border-radius:12px;background:#f9fbff;font-size:clamp(16px,1.35vw,46px);line-height:1.7;resize:none; }
+.workspace-notice-preview { flex:1;display:grid;place-items:center;text-align:center;padding:1em;font-size:clamp(28px,2.3vw,78px);background:var(--yellow-green);border-radius:16px; }
+/* Dialogs and inputs */
+.overlay,.notice-overlay { position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:clamp(14px,2vw,64px);background:rgba(22,37,63,.24);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px); }
+.overlay { z-index:100; }
+.overlay.show { display:flex; }
+.modal { width:min(90vw,1500px);max-height:92vh;max-height:92dvh;overflow:auto;padding:clamp(24px,2.2vw,72px);border:1px solid rgba(255,255,255,.95);background:rgba(249,251,255,.97);box-shadow:0 24px 90px rgba(22,46,87,.23);border-radius:clamp(20px,1.7vw,50px); }
+.modal-title { font-size:clamp(26px,2.3vw,78px);font-weight:600;letter-spacing:-.03em;line-height:1.25; }
+.modal-copy { margin-top:.6em;font-size:clamp(14px,1vw,34px);line-height:1.7;color:var(--muted); }
+.modal-actions { margin-top:clamp(20px,1.5vw,48px);display:flex;flex-wrap:wrap;justify-content:flex-end;gap:clamp(8px,.7vw,22px); }
+.modal-actions .pixel-btn { min-width:clamp(100px,8vw,250px); }
+#startCustomTimerBtn,#showNoticeBtn,#saveNamesBtn,#drawStudentBtn,#drawGroupBtn { background:var(--accent);color:white;border-color:var(--accent); }
+.form-grid { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(16px,1.2vw,38px);margin-top:clamp(22px,1.5vw,48px); }
+.field { min-width:0; }
+.field.full { grid-column:1/-1; }
+.field label { display:block;margin-bottom:.6em;font-size:clamp(13px,.9vw,30px);font-weight:500;color:#56657b; }
+.text-input,.number-input,.select-input,.text-area { width:100%;border:1px solid #cbd6e7;background:white;border-radius:clamp(9px,.7vw,22px);padding:.7em .85em;font-size:clamp(16px,1.1vw,36px);line-height:1.5;box-shadow:inset 0 1px 2px rgba(35,58,100,.03); }
+.text-area { min-height:140px;resize:vertical; }
+.quick-grid { display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(8px,.5vw,16px); }
+.quick-grid .pixel-btn { font-size:clamp(12px,.85vw,28px);padding:.65em .5em; }
+.time-entry { display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:var(--gap); }
+.time-entry .colon { font-size:clamp(24px,2vw,64px); }
+.notice-overlay { z-index:120; }
+.notice-overlay.show { display:flex;cursor:pointer; }
+.notice-card { position:relative;width:min(90vw,2600px);min-height:min(58vh,1100px);max-height:90vh;overflow:auto;display:grid;align-content:center;justify-items:center;gap:clamp(20px,2vw,64px);padding:clamp(70px,5vw,170px);text-align:center;background:var(--honeydew);border:1px solid #fff;box-shadow:0 24px 80px #18325430; }
+.notice-card.celadon { background:var(--celadon); }
+.notice-card.yellow { background:var(--yellow-green); }
+.notice-card.dark { background:var(--dark-khaki);color:white; }
+.notice-title { font-size:clamp(30px,3.2vw,110px);font-weight:500;line-height:1.3; }
+.notice-message { max-width:100%;font-weight:600;font-size:clamp(60px,5vw,200px);line-height:1.4;overflow-wrap:anywhere; }
+.notice-close { display:none; }
+.notice-pin { position:absolute;left:clamp(22px,2vw,60px);top:clamp(22px,2vw,60px);font-size:clamp(12px,.9vw,30px);letter-spacing:.12em;opacity:.65; }
+.notice-card::after { content:'화면을 누르면 닫혀요';position:absolute;right:clamp(22px,2vw,60px);bottom:clamp(20px,1.5vw,48px);font-size:clamp(12px,.85vw,28px);opacity:.55;pointer-events:none; }
+#noticeEditorOverlay .modal { width:min(92vw,1600px);height:min(92dvh,1400px);display:grid;grid-template-rows:auto auto minmax(0,1fr) auto;overflow:hidden; }
+#noticeEditorOverlay .form-grid { min-height:0;overflow:auto;align-content:start;overscroll-behavior:contain;padding-right:8px;padding-bottom:20px; }
+#noticeEditorOverlay .modal-actions { margin-top:0;padding-top:clamp(14px,1vw,32px);border-top:1px solid var(--line); }
+.settings-modal { width:min(94vw,2100px); }
+.settings-grid { display:grid;grid-template-columns:minmax(170px,.65fr) minmax(0,2.2fr);gap:clamp(22px,2vw,64px);margin-top:clamp(22px,1.6vw,50px); }
+.settings-menu { display:grid;align-content:start;gap:clamp(7px,.5vw,16px); }
+.settings-tab { text-align:left; }
+.settings-pane { display:none;min-width:0; }
+.settings-pane.active { display:block; }
+.setting-row { display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:var(--gap);padding:clamp(14px,1.15vw,38px) 0;border-bottom:1px solid var(--line);font-size:clamp(14px,1vw,34px); }
+.toggle { position:relative;width:clamp(54px,3.8vw,120px);height:clamp(30px,2.1vw,66px);border:0;border-radius:100px;background:#c3cbd8;transition:background .18s; }
+.toggle::after { content:'';position:absolute;left:4px;top:4px;bottom:4px;width:calc(55% - 8px);border-radius:50%;background:white;box-shadow:0 2px 4px #0002;transition:left .18s; }
+.toggle.on { background:#32c56a; }
+.toggle.on::after { left:calc(45% + 4px); }
+.range { width:clamp(150px,20vw,600px); }
+.settings-class-grid { display:grid;grid-template-columns:minmax(140px,.5fr) minmax(0,1.5fr);gap:clamp(16px,1vw,32px); }
+.settings-class-buttons { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;align-content:start; }
+.settings-names { min-height:clamp(220px,32vh,600px);margin-top:1em; }
+/* Random picker */
+.random-picker-modal { width:min(94vw,2300px); }
+.random-picker-grid { margin-top:clamp(20px,1.5vw,48px);display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(18px,1.5vw,48px); }
+.draw-card { min-height:clamp(340px,48vh,1000px);display:grid;grid-template-rows:auto auto minmax(0,1fr) auto;gap:clamp(16px,1.2vw,38px);padding:clamp(20px,1.8vw,58px);border:1px solid #d6e3f4;border-radius:clamp(18px,1.3vw,40px);background:linear-gradient(140deg,#f0f6ff,#e6efff); }
+.draw-card.student-card { background:linear-gradient(140deg,#f4f0ff,#ede7f9);border-color:#dfd5ee; }
+.draw-title { font-size:clamp(21px,1.7vw,58px);font-weight:600;line-height:1.4; }
+.draw-sub { margin-top:.4em;font-size:clamp(13px,.95vw,32px);line-height:1.6;color:var(--muted); }
+.draw-result { align-self:center;text-align:center;font-size:clamp(54px,6vw,200px);font-weight:400;color:#3778c8;letter-spacing:-.04em; }
+.draw-result.student-result { color:#8b65b9; }
+.group-chips { display:flex;justify-content:center;flex-wrap:wrap;gap:clamp(7px,.6vw,18px); }
+.group-chip { display:grid;place-items:center;width:clamp(38px,3vw,94px);aspect-ratio:1;border:1px solid #c8d9f0;border-radius:50%;background:white;font-size:clamp(17px,1.2vw,40px);font-weight:500; }
+.group-chip.drawn { background:var(--accent);color:white;border-color:transparent;transform:scale(.92); }
+.draw-order-line,.student-draw-status,.student-draw-history { min-height:1.5em;text-align:center;font-size:clamp(12px,.9vw,30px);line-height:1.6; }
+.draw-order-line { margin-top:.7em; }
+.student-draw-history { margin-top:.5em;min-height:2.7em;color:var(--muted); }
+.draw-actions { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(7px,.6vw,18px); }
+.group-card .draw-actions { grid-template-columns:2fr 1fr; }
+.draw-actions .pixel-btn { font-size:clamp(12px,.9vw,30px);padding:.65em .3em; }
+/* Persistent utilities */
+.toast { position:fixed;left:50%;bottom:calc(var(--dock-h) + var(--gap)*2);transform:translate(-50%,12px);z-index:180;max-width:90vw;padding:.9em 1.5em;text-align:center;background:rgba(31,44,67,.94);color:white;border:1px solid #ffffff24;border-radius:100px;box-shadow:0 8px 30px #16346020;font-size:clamp(13px,.95vw,32px);line-height:1.5;opacity:0;pointer-events:none;transition:opacity .16s,transform .16s; }
+.toast.show { opacity:1;transform:translate(-50%,0); }
+.mini-timer { position:fixed;right:calc(var(--gap)*1.6);bottom:calc(var(--dock-h) + var(--gap)*1.8);z-index:60;display:none;min-width:clamp(180px,14vw,460px);padding:clamp(14px,1vw,32px);background:rgba(248,251,255,.96);border:1px solid #ccdef6;box-shadow:0 8px 30px #16346025;cursor:pointer; }
+.mini-timer.show { display:block; }
+.mini-timer-title { font-size:clamp(11px,.8vw,27px);color:var(--muted); }
+.mini-timer-value { margin-top:.25em;font-size:clamp(30px,2.8vw,92px);font-weight:400;line-height:1.1;color:#2465b6;font-variant-numeric:tabular-nums; }
+.boot-screen { position:fixed;inset:0;z-index:300;display:grid;place-items:center;background:linear-gradient(135deg,#e6f0ff,#f7f9fe 50%,#e7e1fa);transition:opacity .25s; }
+.boot-screen.hide { opacity:0;pointer-events:none; }
+.boot-card { text-align:center;padding:clamp(30px,4vw,140px); }
+.boot-title { font-size:clamp(30px,3.8vw,140px);font-weight:500;line-height:1.3;letter-spacing:-.03em; }
+.boot-sub { margin-top:1.6em;font-size:clamp(13px,.95vw,32px);letter-spacing:.12em;color:var(--muted); }
+.boot-loader { width:min(45vw,800px);height:clamp(5px,.35vw,12px);margin:clamp(24px,2vw,64px) auto 0;background:#d5dfef;border-radius:100px;overflow:hidden; }
+.boot-loader > div { height:100%;width:0;background:var(--accent);border-radius:inherit;animation:loadBar 1.45s ease forwards; }
+@keyframes loadBar { to { width:100%; } }
+.muted-mark::after { content:'×';font-weight:600;color:#c74b43; }
+.hidden { display:none!important; }
+.sr-only { position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0; }
+.high-contrast { --ink:#000;--muted:#333;--line:#69758a;--surface:#fff;--accent:#0056c8;--accent-soft:#e0edff;--dark-khaki:#000; }
+.high-contrast .topbar,.high-contrast .dock,.high-contrast .game-screen { background:#fff;border-color:#626e80; }
+.high-contrast .workspace-image-board { border-color:#315c95; }
+.high-contrast .mini-copy,.high-contrast .header-date,.high-contrast .workspace-image-empty { color:#333; }
+@media (max-width:1350px) {
+  :root { --header-h:66px;--dock-h:82px; }
+  .topbar { grid-template-columns:180px minmax(0,1fr) 270px; }
+  .home-view { grid-template-columns:190px minmax(0,1fr) 230px;gap:14px;padding:18px; }
+  .home-side.right > .mini-card:not(.music-card-shell) { display:none; }
+  .main-clock { font-size:5.5vw; }
+  .class-title { font-size:17px; }
+  .workspace-title { font-size:16px; }
+  .workspace-toolbar { row-gap:8px; }
+  .workspace-toolbar .pixel-btn { flex:1;padding:.6em .5em; }
+  .workspace-card:has(.workspace-image-board) { gap:8px; }
+  .workspace-image-actions { justify-content:flex-end; }
+  .workspace-grid:has(.workspace-image-board) { grid-template-columns:minmax(0,2.15fr) minmax(260px,1fr); }
+}
+@media (max-height:800px) {
+  .home-view { padding:14px;gap:14px; }
+  .home-side { gap:10px; }
+  .mini-card { padding:14px; }
+  .home-side.right > .mini-card:not(.music-card-shell) { display:none; }
+  .leaf-pixel { min-height:65px; }
+  .class-tab { min-height:36px; }
+  .seating-tools .pixel-btn { min-height:38px; }
+  .seat-edit-hint { padding:.5em; }
+  .draw-card { min-height:330px; }
+}
+@media (max-width:1000px) {
+  .topbar { grid-template-columns:130px minmax(0,1fr) 160px;gap:8px;padding:0 10px; }
+  .status-gem { display:none; }
+  .header-clock { display:none; }
+  .header-actions { justify-content:flex-end; }
+  .class-title { font-size:15px; }
+  .home-view { grid-template-columns:minmax(0,1fr) 220px; }
+  .home-side.left { display:none; }
+  .main-clock { font-size:7vw; }
+  .dock-btn { display:flex;flex-direction:column;gap:5px;padding:4px; }
+  .dock-sub { display:none; }
+  .dock-label { font-size:11px;align-self:center; }
+  .seating-view { grid-template-columns:170px minmax(0,1fr);padding:12px;gap:12px; }
+  .seat-head { grid-template-columns:1fr auto; }
+  .blackboard { grid-column:1/-1;grid-row:2;padding:.4em; }
+  .seat-name { font-size:18px; }
+  .desk-grid { gap:7px;padding:10px; }
+  .timer-core { grid-template-columns:minmax(0,1fr) 220px; }
+  .cleanup-core { grid-template-columns:200px minmax(0,1fr); }
+  .cleanup-display { grid-template-columns:1fr; }
+  .cleanup-icon { display:none; }
+  .workspace-toolbar .pixel-btn { flex:1 1 28%; }
+  .workspace-title { flex-basis:100%; }
+  .workspace-card { padding:12px; }
+  .workspace-grid:has(.workspace-image-board) { grid-template-columns:minmax(0,1.85fr) minmax(230px,1fr); }
+  .workspace-image-actions .pixel-btn { padding:.5em;min-height:34px;font-size:11px; }
+  .workspace-random-actions { grid-template-columns:1fr; }
+  .settings-grid { grid-template-columns:150px minmax(0,1fr);gap:18px; }
+}
+@media (max-width:700px) {
+  :root { --header-h:58px;--dock-h:72px;--gap:8px; }
+  .topbar { grid-template-columns:60px minmax(0,1fr) 82px;gap:5px; }
+  .class-title { font-size:clamp(10px,2.65vw,17px);letter-spacing:0; }
+  .eyebrow { display:none; }
+  .status-main { font-size:9px; }
+  .icon-btn { width:34px;height:34px;font-size:18px; }
+  .home-view { display:flex;flex-direction:column;overflow:auto;padding:12px; }
+  .home-center { min-height:300px; }
+  .main-clock { font-size:11vw; }
+  .home-side.right { overflow:visible; }
+  .music-grid { grid-template-columns:repeat(3,minmax(0,1fr)); }
+  .music-track { padding:.7em .4em; }
+  .music-track-main { font-size:11px; }
+  .dock { gap:2px;padding:4px; }
+  .dock-label { font-size:8px; }
+  .dock-icon { width:30px;height:30px; }
+  .workspace-view { padding:10px;gap:10px; }
+  .workspace-toolbar .pixel-btn { min-height:34px;font-size:10px; }
+  .workspace-grid,.workspace-grid:has(.workspace-image-board) { grid-template-columns:1fr;grid-auto-rows:minmax(330px,1fr);overflow:auto; }
+  .workspace-grid:has(.workspace-image-board) { grid-template-rows:minmax(400px,65vh) minmax(300px,1fr); }
+  .workspace-card { min-height:0; }
+  .workspace-card:has(.workspace-image-board) { grid-template-columns:1fr auto;grid-template-rows:auto minmax(0,1fr); }
+  .workspace-card:has(.workspace-image-board) .workspace-card-title { font-size:9px;letter-spacing:0; }
+  .workspace-image-actions .pixel-btn { font-size:9px; }
+  .workspace-random-actions { grid-template-columns:repeat(3,minmax(0,1fr)); }
+  .workspace-timer-number { font-size:68px; }
+  .workspace-seat { font-size:15px; }
+  .workspace-grid:has(.workspace-image-board) .workspace-timer-number { font-size:20cqw; }
+  .timer-view,.cleanup-view { overflow:auto;padding:14px; }
+  .timer-core,.cleanup-core { grid-template-columns:1fr;grid-template-rows:minmax(260px,1fr) auto;overflow:auto; }
+  .timer-side-panel { min-height:240px; }
+  .timer-number { font-size:22vw; }
+  .cleanup-display { min-height:260px; }
+  .wide-control-grid { grid-template-columns:repeat(3,minmax(0,1fr)); }
+  .seating-view { grid-template-columns:1fr;grid-template-rows:auto minmax(360px,1fr);overflow:auto; }
+  .class-selector { padding:10px;overflow:visible; }
+  .class-tabs { grid-template-columns:repeat(5,minmax(0,1fr)); }
+  .seating-tools { grid-template-columns:repeat(2,minmax(0,1fr));padding-top:10px; }
+  .seat-edit-hint { grid-column:1/-1; }
+  .seat-name { font-size:12px; }
+  .seat { padding:4px; }
+  .seat-number { font-size:8px;left:5px;top:5px; }
+  .random-picker-grid { grid-template-columns:1fr; }
+  .modal { width:96vw;padding:22px 18px; }
+  .settings-grid { grid-template-columns:1fr; }
+  .settings-menu { grid-template-columns:repeat(3,minmax(0,1fr)); }
+  .settings-tab { font-size:11px;padding:.7em .4em; }
+  .settings-class-grid { grid-template-columns:1fr; }
+  .settings-class-buttons { grid-template-columns:repeat(5,minmax(0,1fr)); }
+  .quick-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .notice-card { padding:65px 20px; }
+  .notice-message { font-size:8vw!important; }
+}
+@media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important; } }
+
+/* ===== Liquid Glass theme · visual layer only (layout and logic unchanged) ===== */
+:root {
+  --honeydew:#f8f4f0; --celadon:#dcf6f0; --yellow-green:#fff1d6; --dark-khaki:#1f1d33;
+  --ink:#17161f; --muted:#6b6779; --accent:#6366f1; --accent-soft:rgba(129,132,248,.16);
+  --line:rgba(88,76,128,.13); --surface:rgba(255,255,255,.4); --paper:rgba(255,255,255,.44);
+  --lg-indigo:linear-gradient(180deg,#8a8dfc 0%,#6669f2 52%,#5a57e6 100%);
+  --lg-mint:linear-gradient(180deg,#d2faf2 0%,#9cebdd 100%);
+  --lg-iris:linear-gradient(135deg,#c5b0ff 0%,#f2b4e5 26%,rgba(255,255,255,.9) 48%,#9fe9f3 70%,#b7a3ff 100%);
+  --lg-card:linear-gradient(150deg,#cfbcf6 0%,#b7c3f8 46%,#a7ebe3 100%);
+  --lg-orange:#f6a24b;
+  --glass-edge:rgba(255,255,255,.78);
+  --glass-fill:linear-gradient(165deg,rgba(255,255,255,.66) 0%,rgba(255,255,255,.34) 100%);
+  --glass-blur:blur(26px) saturate(1.7);
+  --hi:inset 0 1px 0 rgba(255,255,255,.95),inset 0 -1px 0 rgba(255,255,255,.35);
+  --shadow:0 20px 44px -18px rgba(52,42,92,.28),0 2px 6px rgba(52,42,92,.05);
+  --lift:0 10px 20px -10px rgba(52,42,92,.32),inset 0 1px 0 #fff,inset 0 -2px 4px rgba(186,174,236,.22);
+  --glow-indigo:0 12px 24px -8px rgba(99,102,241,.55),inset 0 1px 0 rgba(255,255,255,.45),inset 0 -2px 4px rgba(40,30,140,.18);
+  --glow-mint:0 12px 24px -10px rgba(64,196,176,.55),inset 0 1px 0 rgba(255,255,255,.9),inset 0 -2px 4px rgba(40,150,140,.12);
+}
+body {
+  background:
+    radial-gradient(55% 48% at 6% 4%,rgba(255,249,241,.98) 0,rgba(255,249,241,0) 62%),
+    radial-gradient(36% 34% at 80% 18%,rgba(199,178,255,.55) 0,rgba(199,178,255,0) 70%),
+    radial-gradient(34% 34% at 18% 86%,rgba(146,232,219,.48) 0,rgba(146,232,219,0) 70%),
+    radial-gradient(28% 30% at 60% 72%,rgba(255,188,214,.30) 0,rgba(255,188,214,0) 70%),
+    linear-gradient(116deg,rgba(66,78,102,0) 52%,rgba(66,78,102,.10) 58%,rgba(66,78,102,0) 64%,rgba(66,78,102,.09) 72%,rgba(66,78,102,0) 80%),
+    linear-gradient(135deg,#f3eae2 0%,#e9e3e9 40%,#cdd0dc 76%,#a3acbf 100%);
+}
+:focus-visible { outline:3px solid rgba(99,102,241,.75); }
+* { scrollbar-color:#bdb5d6 transparent; }
+
+/* Glass shells: top bar, dock, stage */
+.topbar,.dock { position:relative;background:linear-gradient(180deg,rgba(255,255,255,.56),rgba(255,255,255,.26));border:1px solid var(--glass-edge);box-shadow:var(--shadow),var(--hi);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur); }
+.main-stage { box-shadow:0 28px 60px -24px rgba(52,42,92,.32),0 2px 8px rgba(52,42,92,.05); }
+.game-screen { background:linear-gradient(160deg,rgba(255,255,255,.42) 0%,rgba(255,255,255,.18) 55%,rgba(255,255,255,.28) 100%);border:1px solid var(--glass-edge);box-shadow:var(--hi);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur); }
+.topbar::before,.dock::before,.game-screen::before,.student-focus-card::before,.dock-btn.active::before {
+  content:'';position:absolute;inset:-1px;z-index:3;border-radius:inherit;padding:1.5px;background:var(--lg-iris);pointer-events:none;
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;opacity:.6;
+}
+.class-title { font-weight:700;letter-spacing:-.01em; }
+.status-main { color:#4f4ad9; }
+
+/* Buttons: frosted pills */
+.pixel-btn,.class-tab,.settings-tab {
+  background:linear-gradient(180deg,rgba(255,255,255,.86),rgba(255,255,255,.48));
+  border:1px solid rgba(255,255,255,.95);border-radius:999px;box-shadow:var(--lift);color:var(--ink);
+  transition:background .18s,box-shadow .18s,transform .15s,color .18s;
+}
+.pixel-btn:hover,.class-tab:hover,.settings-tab:hover { background:linear-gradient(180deg,#fff,rgba(240,237,255,.72));border-color:#fff;box-shadow:0 12px 24px -10px rgba(99,102,241,.38),inset 0 1px 0 #fff,inset 0 -2px 4px rgba(186,174,236,.28); }
+.pixel-btn.active,.class-tab.active,.settings-tab.active,.workspace-preset.active,
+#startCustomTimerBtn,#showNoticeBtn,#saveNamesBtn,#drawStudentBtn,#drawGroupBtn,.workspace-image-paste {
+  background:var(--lg-indigo);color:#fff;border-color:rgba(255,255,255,.35);box-shadow:var(--glow-indigo);
+}
+.pixel-btn.active:hover,.class-tab.active:hover,.settings-tab.active:hover,
+#startCustomTimerBtn:hover,#showNoticeBtn:hover,#saveNamesBtn:hover,#drawStudentBtn:hover,#drawGroupBtn:hover,.workspace-image-paste:hover {
+  background:linear-gradient(180deg,#9598ff 0%,#6f72f6 52%,#5f5ced 100%);color:#fff;box-shadow:0 14px 28px -8px rgba(99,102,241,.62),inset 0 1px 0 rgba(255,255,255,.5);
+}
+.workspace-timer-setup,#shuffleSeatsBtn { background:var(--lg-mint);color:#123c37;border-color:rgba(255,255,255,.9);box-shadow:var(--glow-mint); }
+.workspace-timer-setup:hover,#shuffleSeatsBtn:hover { background:linear-gradient(180deg,#e0fcf6,#a9efe3);box-shadow:0 14px 26px -10px rgba(64,196,176,.6),inset 0 1px 0 #fff; }
+.icon-btn { border-radius:50%;color:#3a3752; }
+.settings-tab,.music-track { border-radius:clamp(14px,1vw,30px); }
+.workspace-timer-stop,#stopTimerBtn,#cleanupStopBtn { color:#d4513f; }
+
+/* Dock */
+.dock-btn { position:relative; }
+.dock-btn:hover { background:rgba(255,255,255,.5);box-shadow:inset 0 1px 0 rgba(255,255,255,.9); }
+.dock-btn.active { background:linear-gradient(180deg,rgba(255,255,255,.88),rgba(255,255,255,.55));border-color:transparent;box-shadow:0 10px 22px -10px rgba(99,102,241,.4),inset 0 1px 0 #fff; }
+.dock-btn.active::before { opacity:.9;padding:2px; }
+.dock-icon { box-shadow:inset 0 1px 1px rgba(255,255,255,.75),inset 0 -3px 6px rgba(30,20,80,.12),0 6px 12px -5px rgba(60,48,120,.45); }
+.dock-btn .dock-icon { background:linear-gradient(180deg,rgba(255,255,255,.38),rgba(255,255,255,0) 52%),linear-gradient(150deg,#8f92fd,#5c5ee9); }
+.dock-btn[data-action="randomPicker"] .dock-icon { background:linear-gradient(180deg,rgba(255,255,255,.38),rgba(255,255,255,0) 52%),linear-gradient(150deg,#d9b0fa,#9d72ec); }
+.dock-btn[data-action="customTimer"] .dock-icon { background:linear-gradient(180deg,rgba(255,255,255,.38),rgba(255,255,255,0) 52%),linear-gradient(150deg,#ffc684,#f2913a); }
+.dock-btn[data-action="seating"] .dock-icon { background:linear-gradient(180deg,rgba(255,255,255,.38),rgba(255,255,255,0) 52%),linear-gradient(150deg,#92efdb,#2fbfa2); }
+.dock-btn[data-action="notice"] .dock-icon { background:linear-gradient(180deg,rgba(255,255,255,.38),rgba(255,255,255,0) 52%),linear-gradient(150deg,#ffc9e2,#ee8fbf); }
+.dock-btn[data-action="home"] .dock-icon { background:linear-gradient(180deg,rgba(255,255,255,.38),rgba(255,255,255,0) 52%),linear-gradient(150deg,#a6d8fb,#6c8ff2); }
+.dock-btn[data-action="fullscreen"] .dock-icon { background:linear-gradient(180deg,rgba(255,255,255,.38),rgba(255,255,255,0) 52%),linear-gradient(150deg,#c2c6d6,#7f879f); }
+.dock-label { color:var(--ink); }
+
+/* Inner glass cards */
+.mini-card,.clock-card,.timer-display-card,.timer-side-panel,.quest-list,.cleanup-display,.class-selector,.desk-grid,.workspace-card {
+  background:var(--glass-fill);border:1px solid rgba(255,255,255,.82);box-shadow:0 16px 34px -18px rgba(52,42,92,.3),var(--hi);
+}
+.home-side.left .mini-card:first-child { background:linear-gradient(150deg,rgba(225,214,255,.75),rgba(255,255,255,.4) 70%); }
+#homeClassLabel { color:#4f46e5; }
+.mini-title,.workspace-card-title { color:#2b2840; }
+.clock-card { background:linear-gradient(160deg,rgba(255,255,255,.78) 0%,rgba(255,255,255,.38) 60%,rgba(240,236,255,.46) 100%); }
+.clock-kicker { color:#7a74a0; }
+.main-clock { color:#1e1b3d; }
+.dialog-box { background:var(--lg-card);border:1px solid rgba(255,255,255,.8);color:#2b2660;box-shadow:0 18px 34px -16px rgba(108,92,220,.45),inset 0 1px 0 rgba(255,255,255,.8); }
+.leaf-pixel { color:#fff;background:linear-gradient(180deg,rgba(255,255,255,.3),rgba(255,255,255,0) 50%),var(--lg-card);border:1px solid rgba(255,255,255,.85);box-shadow:0 16px 30px -16px rgba(108,92,220,.5),inset 0 1px 0 rgba(255,255,255,.85);text-shadow:0 2px 10px rgba(80,60,180,.25); }
+
+/* Timer & clean-up */
+.timer-state-badge { background:linear-gradient(180deg,rgba(255,255,255,.85),rgba(255,255,255,.5));color:#4f46e5;border:1px solid #fff;box-shadow:var(--lift); }
+.timer-number { color:#211e45; }
+.timer-progress { background:rgba(255,255,255,.5);box-shadow:inset 0 1px 3px rgba(52,42,92,.14),0 1px 0 rgba(255,255,255,.8); }
+.timer-progress-fill { background:linear-gradient(90deg,#9eeae0 0%,#a99dfa 50%,#6366f1 100%);box-shadow:inset 0 1px 0 rgba(255,255,255,.5); }
+.danger-state .timer-display-card { background:linear-gradient(160deg,rgba(255,232,226,.85),rgba(255,214,204,.5));border-color:rgba(255,255,255,.85); }
+.danger-state .timer-number,.danger-state .timer-state-badge { color:#dd4b36; }
+.danger-state .timer-state-badge { background:rgba(255,236,232,.9);border-color:#fff; }
+.quest-step.active { background:linear-gradient(180deg,rgba(255,255,255,.85),rgba(236,233,255,.7));color:#4338ca;box-shadow:var(--lift); }
+.cleanup-icon { color:#fff;background:linear-gradient(180deg,rgba(255,255,255,.3),rgba(255,255,255,0) 50%),var(--lg-card);border:1px solid rgba(255,255,255,.85);box-shadow:0 16px 30px -16px rgba(108,92,220,.5),inset 0 1px 0 rgba(255,255,255,.85); }
+.cleanup-time { color:#4f46e5; }
+
+/* Seating */
+.blackboard { background:var(--lg-mint);color:#164a43;border:1px solid rgba(255,255,255,.9);box-shadow:var(--glow-mint); }
+.seat { background:linear-gradient(165deg,rgba(255,255,255,.9),rgba(255,255,255,.5));border:1px solid rgba(255,255,255,.95);box-shadow:0 10px 20px -12px rgba(52,42,92,.32),inset 0 1px 0 #fff,inset 0 -2px 4px rgba(186,174,236,.2); }
+.seat:nth-child(6n+3),.seat:nth-child(6n+4) { background:linear-gradient(165deg,rgba(246,242,255,.92),rgba(226,218,255,.55));border-color:rgba(255,255,255,.95); }
+.seat.empty { background:rgba(255,255,255,.18);border:1.5px dashed rgba(140,128,190,.35);box-shadow:none; }
+.seat.highlighted,.seat.move-selected { background:var(--lg-indigo);color:#fff;border-color:rgba(255,255,255,.4);box-shadow:var(--glow-indigo); }
+.seat.highlighted .seat-number,.seat.move-selected .seat-number { color:rgba(255,255,255,.8); }
+@keyframes seatPulse { from { box-shadow:0 12px 24px -8px rgba(99,102,241,.55); } to { box-shadow:0 0 0 6px rgba(129,132,248,.3),0 16px 30px -8px rgba(99,102,241,.6); } }
+.seat-edit-hint { background:rgba(255,255,255,.45);border:1px solid rgba(255,255,255,.8); }
+.student-focus { background:rgba(36,30,62,.22); }
+.student-focus-card { position:relative;background:linear-gradient(160deg,rgba(255,255,255,.88),rgba(246,242,255,.66));border:1px solid #fff;box-shadow:0 30px 80px -20px rgba(52,42,120,.45),var(--hi);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur); }
+.student-focus-name { color:#4f46e5; }
+
+/* Multi view */
+.workspace-image-board { border:1.5px dashed rgba(130,116,210,.42);background:radial-gradient(circle,rgba(120,106,190,.22) 1px,transparent 1px) 0 0/22px 22px,rgba(255,255,255,.38);box-shadow:inset 0 2px 8px rgba(52,42,92,.06); }
+.workspace-image-board:focus { border-color:var(--accent);box-shadow:inset 0 0 0 2px rgba(99,102,241,.16); }
+.workspace-image-board:has(img) { background:rgba(255,255,255,.92);border:1px solid #fff; }
+.workspace-image-empty::before { background:linear-gradient(180deg,rgba(255,255,255,.35),rgba(255,255,255,0) 50%),var(--lg-card);color:#fff;box-shadow:0 12px 24px -12px rgba(108,92,220,.55),inset 0 1px 0 rgba(255,255,255,.85); }
+.workspace-image-empty strong { color:#4f46e5; }
+.workspace-timer-number,.workspace-random-result { color:#2a2665; }
+.workspace-seat { background:linear-gradient(165deg,rgba(255,255,255,.9),rgba(255,255,255,.5));border:1px solid rgba(255,255,255,.95);box-shadow:0 6px 12px -8px rgba(52,42,92,.3),inset 0 1px 0 #fff; }
+.workspace-seat:nth-child(6n+3),.workspace-seat:nth-child(6n+4) { background:linear-gradient(165deg,rgba(246,242,255,.92),rgba(226,218,255,.55));border-color:#fff; }
+.workspace-seat:disabled { background:rgba(255,255,255,.2); }
+.workspace-notice-form input,.workspace-notice-form textarea,
+.text-input,.number-input,.select-input,.text-area {
+  background:rgba(255,255,255,.78);border:1px solid rgba(255,255,255,.95);
+  box-shadow:inset 0 2px 4px rgba(52,42,92,.08),0 8px 18px -12px rgba(52,42,92,.3);
+}
+.text-input:focus,.number-input:focus,.select-input:focus,.text-area:focus,
+.workspace-notice-form input:focus,.workspace-notice-form textarea:focus { outline:none;border-color:rgba(129,132,248,.7);box-shadow:0 0 0 4px rgba(129,132,248,.2),inset 0 2px 4px rgba(52,42,92,.06); }
+.workspace-notice-preview { box-shadow:inset 0 1px 0 rgba(255,255,255,.8); }
+
+/* Dialogs */
+.overlay,.notice-overlay { background:rgba(40,34,70,.22); }
+.modal { background:linear-gradient(160deg,rgba(255,255,255,.9) 0%,rgba(250,247,255,.78) 100%);border:1px solid #fff;box-shadow:0 40px 100px -30px rgba(40,30,100,.5),var(--hi);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur); }
+.field label { color:#5a5570; }
+.toggle { background:rgba(205,200,222,.85);box-shadow:inset 0 2px 4px rgba(52,42,92,.18),0 1px 0 rgba(255,255,255,.9); }
+.toggle::after { box-shadow:0 3px 6px rgba(40,30,80,.25),inset 0 -2px 3px rgba(0,0,0,.06); }
+.toggle.on { background:var(--lg-indigo);box-shadow:inset 0 1px 2px rgba(30,20,120,.25),0 8px 16px -8px rgba(99,102,241,.6); }
+.toggle.on::after { background:radial-gradient(circle at 35% 30%,#ffd29f,var(--lg-orange) 70%); }
+.draw-card { background:linear-gradient(150deg,rgba(214,226,255,.82),rgba(186,236,230,.5));border:1px solid #fff;box-shadow:0 18px 36px -18px rgba(52,42,92,.32),var(--hi); }
+.draw-card.student-card { background:linear-gradient(150deg,rgba(232,220,255,.85),rgba(250,214,238,.5));border-color:#fff; }
+.draw-result { color:#4f46e5; }
+.draw-result.student-result { color:#9254de; }
+.group-chip { background:linear-gradient(180deg,#fff,rgba(255,255,255,.6));border:1px solid #fff;box-shadow:var(--lift); }
+.group-chip.drawn { background:var(--lg-indigo);color:#fff;box-shadow:var(--glow-indigo); }
+.notice-card { border:1px solid rgba(255,255,255,.9);box-shadow:0 40px 100px -30px rgba(40,30,100,.5),var(--hi); }
+.notice-card.celadon { background:linear-gradient(160deg,#ebfbf7,var(--celadon)); }
+.notice-card.yellow { background:linear-gradient(160deg,#fff8ea,var(--yellow-green)); }
+
+/* Persistent utilities */
+.toast { background:rgba(30,26,52,.78);border:1px solid rgba(255,255,255,.18);box-shadow:0 16px 36px -12px rgba(30,20,80,.45);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px); }
+.mini-timer { background:linear-gradient(160deg,rgba(255,255,255,.8),rgba(255,255,255,.5));border:1px solid #fff;border-radius:var(--radius-cut);box-shadow:0 18px 40px -16px rgba(52,42,92,.4),var(--hi);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur); }
+.mini-timer-value { color:#4f46e5; }
+.boot-screen { background:
+    radial-gradient(40% 40% at 78% 22%,rgba(199,178,255,.55) 0,rgba(199,178,255,0) 70%),
+    radial-gradient(38% 38% at 20% 82%,rgba(146,232,219,.5) 0,rgba(146,232,219,0) 70%),
+    linear-gradient(135deg,#f3eae2 0%,#e9e3e9 45%,#cdd0dc 100%); }
+.boot-loader { background:rgba(255,255,255,.55);box-shadow:inset 0 1px 3px rgba(52,42,92,.15); }
+.boot-loader > div { background:linear-gradient(90deg,#9eeae0,#a99dfa,#6366f1); }
+
+/* Keep high-contrast mode plain and readable */
+.high-contrast .pixel-btn,.high-contrast .class-tab,.high-contrast .settings-tab,.high-contrast .seat,.high-contrast .workspace-seat,
+.high-contrast .mini-card,.high-contrast .clock-card,.high-contrast .timer-display-card,.high-contrast .timer-side-panel,.high-contrast .quest-list,
+.high-contrast .cleanup-display,.high-contrast .class-selector,.high-contrast .desk-grid,.high-contrast .workspace-card { background:#fff;border-color:#626e80;box-shadow:none; }
+.high-contrast .pixel-btn.active,.high-contrast .class-tab.active,.high-contrast .settings-tab.active,.high-contrast .seat.highlighted,.high-contrast .seat.move-selected { background:var(--accent);color:#fff; }
+.high-contrast .topbar::before,.high-contrast .dock::before,.high-contrast .game-screen::before { display:none; }
+</style>
+</head>
+<body>
+<div id="bootScreen" class="boot-screen" aria-label="시스템 시작 화면">
+  <div class="boot-card">
+    <div class="boot-title">DODAM ENGLISH CLASS</div>
+    <div class="boot-sub">CLASSROOM SYSTEM · LOADING</div>
+    <div class="boot-loader"><div></div></div>
+    <div class="boot-sub">화면을 누르면 바로 시작합니다.</div>
+  </div>
+</div>
+
+<div id="appShell" class="app-shell">
+  <header class="topbar" aria-label="학급 시스템 상단 상태 표시줄">
+    <section class="top-status pixel-panel pixel-cut">
+      <div class="status-gem" aria-hidden="true"></div>
+      <div class="status-copy">
+        <div class="eyebrow">CURRENT MODE</div>
+        <div id="currentModeLabel" class="status-main">HOME</div>
+      </div>
+    </section>
+
+    <section class="brand-panel pixel-panel pixel-cut">
+      <div class="class-title">DODAM ENGLISH CLASS</div>
+    </section>
+
+    <section class="header-actions pixel-panel pixel-cut">
+      <div class="header-clock">
+        <div id="headerTime" class="header-time">PM 02:35</div>
+        <div id="headerDate" class="header-date">2026. 07. 14. TUE</div>
+      </div>
+      <div class="icon-stack">
+        <button id="soundBtn" class="pixel-btn icon-btn pixel-cut" type="button" aria-label="알림음 켜기 또는 끄기" title="알림음">
+          <span class="icon-inner"><span id="soundIcon">♪</span><span class="icon-label">SOUND</span></span>
+        </button>
+        <button id="settingsBtn" class="pixel-btn icon-btn pixel-cut" type="button" aria-label="교사용 설정 열기" title="설정">
+          <span class="icon-inner"><span>⚙</span><span class="icon-label">SYSTEM</span></span>
+        </button>
+      </div>
+    </section>
+  </header>
+
+  <main class="main-stage">
+    <section class="game-screen pixel-cut" aria-live="polite">
+      <section id="homeView" class="view home-view active" data-view="home">
+        <aside class="home-side left">
+          <article class="mini-card pixel-cut">
+            <div class="mini-title">TODAY'S CLASS</div>
+            <div id="homeClassLabel" class="mini-copy">현재 선택: 3-1</div>
+          </article>
+          <article class="mini-card pixel-cut">
+            <div class="mini-title">SHORTCUT</div>
+            <div class="mini-copy">W 멀티 화면<br>D 랜덤 뽑기<br>T 일반 타이머<br>S 자리표<br>A 알림장</div>
+          </article>
+          <div class="leaf-pixel pixel-cut">✦</div>
+        </aside>
+
+        <div class="home-center">
+          <section class="clock-card pixel-cut">
+            <div class="clock-kicker">CLASSROOM CLOCK</div>
+            <div id="mainClock" class="main-clock">PM 02:35</div>
+            <div id="mainDate" class="main-date">2026년 7월 14일 화요일</div>
+            <div id="defaultMessageBox" class="dialog-box pixel-cut">Let's have a great English class today!</div>
+          </section>
+        </div>
+
+        <aside class="home-side right">
+          <article class="mini-card pixel-cut">
+            <div class="mini-title">CLASS STATUS</div>
+            <div class="mini-copy">전자칠판 터치와 키보드 단축키를 모두 사용할 수 있습니다.</div>
+          </article>
+          <article class="mini-card pixel-cut">
+            <div class="mini-title">NEXT ACTION</div>
+            <div class="mini-copy">하단 메뉴에서 멀티 화면, 랜덤 뽑기, 타이머, 자리표, 알림장을 선택하세요.</div>
+          </article>
+          <article class="mini-card pixel-cut music-card-shell">
+            <div class="mini-title">BGM PLAYER</div>
+            <div class="mini-copy" style="margin-top:.4em">BGM 음원을 추가하면 사용할 수 있어요.</div>
+            <div id="musicButtons" class="music-grid"></div>
+            <div class="music-actions-row">
+              <button id="musicStopBtn" class="pixel-btn pixel-cut mini-action-btn" type="button">■ 정지</button>
+            </div>
+            <div id="musicStatus" class="mini-copy music-status">쉬는시간, 활동시간, 개인업무 BGM을 선택해 주세요.</div>
+          </article>
+          <div class="leaf-pixel pixel-cut">ABC</div>
+        </aside>
+      </section>
+
+      <section id="timerView" class="view timer-view" data-view="timer">
+        <div class="screen-heading-row">
+          <div>
+            <div id="timerHeading" class="screen-heading">TIMER</div>
+            <div id="timerSubtitle" class="screen-subtitle">활동 시간을 확인하세요.</div>
+          </div>
+          <div id="timerStateBadge" class="timer-state-badge pixel-cut">READY</div>
+        </div>
+
+        <div class="timer-core">
+          <section class="timer-display-card pixel-cut">
+            <div class="timer-number-wrap">
+              <div>
+                <div id="timerNumber" class="timer-number">10:00</div>
+                <div id="timerMessage" class="timer-message">즐겁고 안전하게 쉬어요.</div>
+              </div>
+            </div>
+            <div>
+              <div class="progress-label-row"><span>TIME</span><span id="timerPercent">100%</span></div>
+              <div class="timer-progress"><div id="timerProgressFill" class="timer-progress-fill"></div></div>
+            </div>
+          </section>
+
+          <aside class="timer-side-panel pixel-cut">
+            <div class="timer-side-title">COMMAND</div>
+            <div id="timerSideInfo" class="timer-side-info">타이머가 실행 중입니다.</div>
+            <div class="control-grid">
+              <button id="pauseResumeBtn" class="pixel-btn pixel-cut" type="button">일시정지</button>
+              <button id="restartTimerBtn" class="pixel-btn pixel-cut" type="button">처음부터</button>
+              <button id="minusMinuteBtn" class="pixel-btn pixel-cut" type="button">-1분</button>
+              <button id="plusMinuteBtn" class="pixel-btn pixel-cut" type="button">+1분</button>
+              <button id="plusTenBtn" class="pixel-btn pixel-cut" type="button">+10초</button>
+              <button id="stopTimerBtn" class="pixel-btn pixel-cut" type="button">종료</button>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section id="cleanupView" class="view cleanup-view" data-view="cleanup">
+        <div class="screen-heading-row">
+          <div>
+            <div class="screen-heading">CLEAN-UP QUEST</div>
+            <div class="screen-subtitle">3분 동안 교실을 함께 정리해요.</div>
+          </div>
+          <div id="cleanupStateBadge" class="timer-state-badge pixel-cut">STEP 1 / 3</div>
+        </div>
+
+        <div class="cleanup-core">
+          <aside class="quest-list pixel-cut">
+            <div class="quest-title">QUEST LIST</div>
+            <div id="cleanupSteps"></div>
+          </aside>
+          <section class="cleanup-display pixel-cut">
+            <div id="cleanupIcon" class="cleanup-icon pixel-cut">▦</div>
+            <div class="cleanup-info">
+              <div id="cleanupTitle" class="cleanup-step-title">책상 줄 맞추기</div>
+              <div id="cleanupMessage" class="cleanup-step-message">앞뒤와 옆줄을 반듯하게 맞춰요.</div>
+              <div id="cleanupTime" class="cleanup-time">1:00</div>
+            </div>
+          </section>
+        </div>
+
+        <div>
+          <div class="progress-label-row"><span>TOTAL PROGRESS</span><span id="cleanupPercent">0%</span></div>
+          <div class="timer-progress"><div id="cleanupProgressFill" class="timer-progress-fill" style="width:0%"></div></div>
+          <div class="wide-control-grid" style="margin-top:clamp(10px,.7vw,22px)">
+            <button id="cleanupPauseBtn" class="pixel-btn pixel-cut" type="button">일시정지</button>
+            <button id="cleanupPrevBtn" class="pixel-btn pixel-cut" type="button">이전 단계</button>
+            <button id="cleanupNextBtn" class="pixel-btn pixel-cut" type="button">다음 단계</button>
+            <button id="cleanupRestartStepBtn" class="pixel-btn pixel-cut" type="button">단계 다시</button>
+            <button id="cleanupRestartAllBtn" class="pixel-btn pixel-cut" type="button">처음부터</button>
+            <button id="cleanupStopBtn" class="pixel-btn pixel-cut" type="button">종료</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="seatingView" class="view seating-view" data-view="seating">
+        <aside class="class-selector pixel-cut">
+          <div class="selector-title">CLASS SELECT</div>
+          <div id="classTabs" class="class-tabs"></div>
+          <div class="seating-tools">
+            <button id="shuffleSeatsBtn" class="pixel-btn pixel-cut" type="button">▶ 자리 섞기</button>
+            <button id="moveSeatsBtn" class="pixel-btn pixel-cut" type="button">↔ 자리 이동</button>
+            <button id="resetLayoutBtn" class="pixel-btn pixel-cut" type="button">기본 배치</button>
+            <button id="openNamesBtn" class="pixel-btn pixel-cut" type="button">명단 편집</button>
+            <div id="seatEditHint" class="seat-edit-hint">자리 이동을 누른 뒤 학생 자리와 옮길 자리를 차례로 터치하세요.</div>
+          </div>
+        </aside>
+        <section class="seat-stage">
+          <div class="seat-head">
+            <div id="seatClassTitle" class="seat-class-title">3학년 1반 자리표</div>
+            <div class="blackboard pixel-cut">BLACKBOARD · 교실 앞</div>
+            <div id="seatCount" class="seat-count">21 / 24</div>
+          </div>
+          <div id="deskGrid" class="desk-grid pixel-cut"></div>
+        </section>
+      </section>
+
+      <section id="workspaceView" class="view workspace-view" data-view="workspace">
+        <div class="workspace-toolbar">
+          <div class="workspace-title">MULTI VIEW</div>
+          <button class="pixel-btn pixel-cut workspace-preset" data-workspace-preset="seating-random" type="button">자리표 + 랜덤</button>
+          <button class="pixel-btn pixel-cut workspace-preset" data-workspace-preset="random-timer" type="button">랜덤 + 타이머</button>
+          <button class="pixel-btn pixel-cut workspace-preset" data-workspace-preset="timer-seating" type="button">타이머 + 자리표</button>
+          <button class="pixel-btn pixel-cut workspace-preset" data-workspace-preset="notice-timer" type="button">알림장 + 타이머</button>
+          <button class="pixel-btn pixel-cut workspace-preset" data-workspace-preset="image-timer" type="button">그림 + 타이머</button>
+          <button class="pixel-btn pixel-cut workspace-preset" data-workspace-preset="image-seating" type="button">그림 + 자리표</button>
+        </div>
+        <div class="workspace-grid">
+          <section id="workspacePanelA" class="workspace-card pixel-cut"></section>
+          <section id="workspacePanelB" class="workspace-card pixel-cut"></section>
+        </div>
+      </section>
+
+      <div id="studentFocus" class="student-focus" role="dialog" aria-modal="true" aria-label="학생 이름 강조">
+        <div class="student-focus-card pixel-cut">
+          <div class="student-focus-label">SELECTED STUDENT</div>
+          <div id="studentFocusName" class="student-focus-name">학생 이름</div>
+          <button id="studentFocusClose" class="pixel-btn student-focus-close pixel-cut" type="button">닫기</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <nav class="dock" aria-label="교실 주요 기능">
+    <button class="dock-btn pixel-cut" data-action="workspace" type="button"><span class="dock-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M14 4v16M14 11h7"/></svg></span><span class="dock-label">멀티 화면</span><span class="dock-sub">MULTI</span></button>
+    <button class="dock-btn pixel-cut" data-action="randomPicker" type="button"><span class="dock-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m12 3 2.7 6.3L21 12l-6.3 2.7L12 21l-2.7-6.3L3 12l6.3-2.7Z"/></svg></span><span class="dock-label">랜덤 뽑기</span><span class="dock-sub">PICK</span></button>
+    <button class="dock-btn pixel-cut" data-action="customTimer" type="button"><span class="dock-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M9 2h6M12 2v3M19 5l1.5 1.5"/></svg></span><span class="dock-label">타이머</span><span class="dock-sub">TIMER</span></button>
+    <button class="dock-btn pixel-cut" data-action="seating" type="button"><span class="dock-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg></span><span class="dock-label">자리표</span><span class="dock-sub">SEATING</span></button>
+    <button class="dock-btn pixel-cut" data-action="notice" type="button"><span class="dock-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 4H6a2 2 0 0 0-2 2v14h16V6a2 2 0 0 0-2-2h-2"/><rect x="8" y="2" width="8" height="4" rx="1.5"/><path d="M8 11h8M8 15h5"/></svg></span><span class="dock-label">알림장</span><span class="dock-sub">NOTICE</span></button>
+    <button class="dock-btn pixel-cut active" data-action="home" type="button"><span class="dock-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m3 10 9-7 9 7M5 9v11h5v-6h4v6h5V9"/></svg></span><span class="dock-label">홈</span><span class="dock-sub">HOME</span></button>
+    <button id="fullscreenBtn" class="dock-btn pixel-cut" data-action="fullscreen" type="button"><span class="dock-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 3H3v5M16 3h5v5M21 16v5h-5M8 21H3v-5"/></svg></span><span class="dock-label">전체화면</span><span class="dock-sub">FULL</span></button>
+  </nav>
+</div>
+
+<div id="randomPickerOverlay" class="overlay" role="dialog" aria-modal="true" aria-labelledby="randomPickerTitle">
+  <section class="modal random-picker-modal pixel-cut">
+    <div id="randomPickerTitle" class="modal-title">RANDOM PICKER</div>
+    <div class="modal-copy">모둠 발표 순서와 학생 한 명을 빠르게 뽑아요.</div>
+    <div class="random-picker-grid">
+      <section class="draw-card group-card">
+        <div>
+          <div class="draw-title">1–6 모둠 순서</div>
+          <div class="draw-sub">중복 없이 하나씩 뽑아 전체 순서를 완성해요.</div>
+        </div>
+        <div>
+          <div id="groupChips" class="group-chips" aria-label="모둠 뽑기 현황"></div>
+          <div id="groupOrderText" class="draw-order-line">순서: 아직 뽑지 않았어요</div>
+        </div>
+        <div id="groupDrawResult" class="draw-result">READY</div>
+        <div class="draw-actions">
+          <button id="drawGroupBtn" class="pixel-btn pixel-cut" type="button">다음 모둠 뽑기</button>
+          <button id="resetGroupDrawBtn" class="pixel-btn pixel-cut" type="button">초기화</button>
+        </div>
+      </section>
+      <section class="draw-card student-card">
+        <div>
+          <div class="draw-title">학생 1명 뽑기</div>
+          <div id="studentDrawClass" class="draw-sub">현재 반 명단에서 무작위로 뽑아요.</div>
+        </div>
+        <div>
+          <div id="studentDrawStatus" class="student-draw-status">남은 학생을 확인하는 중입니다.</div>
+          <div id="studentDrawHistory" class="student-draw-history">아직 뽑은 학생이 없어요.</div>
+        </div>
+        <div id="studentDrawResult" class="draw-result student-result">READY</div>
+        <div class="draw-actions">
+          <button id="drawStudentBtn" class="pixel-btn pixel-cut" type="button">학생 뽑기</button>
+          <button id="resetStudentDrawBtn" class="pixel-btn pixel-cut" type="button">학생 초기화</button>
+          <button id="closeRandomPickerBtn" class="pixel-btn pixel-cut" type="button">닫기</button>
+        </div>
+      </section>
+    </div>
+  </section>
+</div>
+
+<div id="miniTimer" class="mini-timer pixel-cut" role="button" tabindex="0" aria-label="실행 중인 타이머 열기">
+  <div id="miniTimerTitle" class="mini-timer-title">TIMER</div>
+  <div id="miniTimerValue" class="mini-timer-value">05:00</div>
+</div>
+
+<div id="timerSetupOverlay" class="overlay" role="dialog" aria-modal="true" aria-labelledby="timerSetupTitle">
+  <section class="modal pixel-cut">
+    <div id="timerSetupTitle" class="modal-title">CUSTOM TIMER</div>
+    <div class="modal-copy">활동 이름과 시간을 정해 주세요.</div>
+    <div class="form-grid">
+      <div class="field full">
+        <label for="customTimerTitle">타이머 제목</label>
+        <input id="customTimerTitle" class="text-input" type="text" maxlength="30" value="문제 풀기" />
+      </div>
+      <div class="field full">
+        <label>빠른 시간 선택</label>
+        <div id="quickTimes" class="quick-grid"></div>
+      </div>
+      <div class="field full">
+        <label>직접 입력</label>
+        <div class="time-entry">
+          <input id="customMinutes" class="number-input" type="number" min="0" max="99" value="5" aria-label="분" />
+          <span class="colon">:</span>
+          <input id="customSeconds" class="number-input" type="number" min="0" max="59" value="0" aria-label="초" />
+        </div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button id="closeTimerSetupBtn" class="pixel-btn pixel-cut" type="button">취소</button>
+      <button id="startCustomTimerBtn" class="pixel-btn pixel-cut" type="button">▶ 시작</button>
+    </div>
+  </section>
+</div>
+
+<div id="noticeEditorOverlay" class="overlay" role="dialog" aria-modal="true" aria-labelledby="noticeEditorTitle">
+  <section class="modal pixel-cut">
+    <div id="noticeEditorTitle" class="modal-title">NOTICE</div>
+    <div class="modal-copy">전자칠판 중앙에 표시할 안내 문구를 입력하세요.</div>
+    <div class="form-grid">
+      <div class="field">
+        <label for="noticeTitleInput">제목</label>
+        <input id="noticeTitleInput" class="text-input" type="text" maxlength="30" value="수업 안내" />
+      </div>
+      <div class="field">
+        <label for="noticeDuration">표시 시간</label>
+        <select id="noticeDuration" class="select-input">
+          <option value="5">5초</option>
+          <option value="10">10초</option>
+          <option value="30">30초</option>
+          <option value="60">1분</option>
+          <option value="0">계속 표시</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="noticeTone">표시 색상</label>
+        <select id="noticeTone" class="select-input">
+          <option value="honeydew">Honeydew</option>
+          <option value="celadon">Celadon</option>
+          <option value="yellow">Yellow Green</option>
+          <option value="dark">Dark Khaki</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="noticeIcon">아이콘</label>
+        <select id="noticeIcon" class="select-input">
+          <option value="!">! 알림</option>
+          <option value="✦">✦ 중요</option>
+          <option value="ABC">ABC 영어</option>
+          <option value="▦">▦ 준비</option>
+          <option value="♪">♪ 활동</option>
+        </select>
+      </div>
+      <div class="field full">
+        <label for="noticeMessageInput">본문</label>
+        <textarea id="noticeMessageInput" class="text-area" maxlength="180">교과서를 펼쳐 주세요.</textarea>
+      </div>
+      <div class="field full">
+        <label>빠른 문구</label>
+        <div id="noticePresets" class="quick-grid"></div>
+      </div>
+      <div class="field full">
+        <label>최근 사용 문구</label>
+        <div id="recentNotices" class="quick-grid"></div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button id="closeNoticeEditorBtn" class="pixel-btn pixel-cut" type="button">취소</button>
+      <button id="showNoticeBtn" class="pixel-btn pixel-cut" type="button">▶ 표시</button>
+    </div>
+  </section>
+</div>
+
+<div id="noticeOverlay" class="notice-overlay" role="dialog" aria-modal="true" aria-label="교실 안내 문구">
+  <section id="noticeCard" class="notice-card pixel-cut">
+    <button id="noticeCloseBtn" class="pixel-btn icon-btn notice-close pixel-cut" type="button" aria-label="안내 닫기">×</button>
+    <div id="noticePin" class="notice-pin">NOTICE</div>
+    <div id="noticeDisplayTitle" class="notice-title">수업 안내</div>
+    <div id="noticeDisplayMessage" class="notice-message">교과서를 펼쳐 주세요.</div>
+  </section>
+</div>
+
+<div id="choiceOverlay" class="overlay" role="dialog" aria-modal="true" aria-labelledby="choiceTitle">
+  <section class="modal pixel-cut" style="width:min(90vw,1300px)">
+    <div id="choiceTitle" class="modal-title">CONFIRM</div>
+    <div id="choiceMessage" class="modal-copy">현재 실행 중인 타이머를 종료할까요?</div>
+    <div id="choiceActions" class="modal-actions"></div>
+  </section>
+</div>
+
+<div id="settingsOverlay" class="overlay" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+  <section class="modal settings-modal pixel-cut">
+    <div id="settingsTitle" class="modal-title">SYSTEM MENU</div>
+    <div class="modal-copy">교사용 설정과 학급 명단을 관리합니다.</div>
+    <div class="settings-grid">
+      <div class="settings-menu">
+        <button class="settings-tab active" data-settings-tab="display" type="button">▶ 화면·시간</button>
+        <button class="settings-tab" data-settings-tab="sound" type="button">알림음</button>
+        <button class="settings-tab" data-settings-tab="message" type="button">기본 문구</button>
+        <button class="settings-tab" data-settings-tab="classes" type="button">학급 명단</button>
+        <button class="settings-tab" data-settings-tab="data" type="button">데이터 관리</button>
+      </div>
+      <div>
+        <section class="settings-pane active" data-settings-pane="display">
+          <div class="setting-row"><span>24시간제로 표시</span><button id="timeFormatToggle" class="toggle" type="button" aria-label="24시간제 설정"></button></div>
+          <div class="setting-row"><span>초 표시</span><button id="secondsToggle" class="toggle" type="button" aria-label="초 표시 설정"></button></div>
+          <div class="setting-row"><span>고대비 모드</span><button id="contrastToggle" class="toggle" type="button" aria-label="고대비 모드 설정"></button></div>
+          <div class="setting-row"><span>시작 화면 표시</span><button id="bootToggle" class="toggle on" type="button" aria-label="시작 화면 표시 설정"></button></div>
+          <div class="setting-row"><span>화면 밝기</span><input id="brightnessRange" class="range" type="range" min="0.75" max="1.2" step="0.05" value="1" /></div>
+        </section>
+        <section class="settings-pane" data-settings-pane="sound">
+          <div class="setting-row"><span>알림음 사용</span><button id="soundToggle" class="toggle on" type="button" aria-label="알림음 설정"></button></div>
+          <div class="setting-row"><span>알림음 크기</span><input id="volumeRange" class="range" type="range" min="0" max="1" step="0.05" value="0.7" /></div>
+          <div class="setting-row"><span>소리 시험</span><button id="testSoundBtn" class="pixel-btn pixel-cut" type="button">TEST ♪</button></div>
+          <div class="modal-copy" style="margin-top:1.1em">홈 화면의 BGM PLAYER에서 쉬는시간 · 활동시간 · 개인업무 음악을 재생할 수 있습니다.</div>
+        </section>
+        <section class="settings-pane" data-settings-pane="message">
+          <div class="field">
+            <label for="defaultMessageInput">홈 화면 문구 · 비워 두면 영어 문구가 랜덤 표시됩니다</label>
+            <textarea id="defaultMessageInput" class="text-area" placeholder="고정할 문구를 입력하거나 비워 두세요."></textarea>
+          </div>
+          <div class="modal-actions"><button id="saveDefaultMessageBtn" class="pixel-btn pixel-cut" type="button">문구 저장</button></div>
+        </section>
+        <section class="settings-pane" data-settings-pane="classes">
+          <div class="settings-class-grid">
+            <div id="settingsClassButtons" class="settings-class-buttons"></div>
+            <div>
+              <div id="settingsClassTitle" class="mini-title">3학년 1반 명단</div>
+              <textarea id="settingsNamesInput" class="text-area settings-names" spellcheck="false"></textarea>
+              <div id="settingsNameCount" class="mini-copy">0 / 24</div>
+              <div class="modal-actions" style="justify-content:flex-start">
+                <button id="saveNamesBtn" class="pixel-btn pixel-cut" type="button">저장</button>
+                <button id="resetNamesBtn" class="pixel-btn pixel-cut" type="button">초기화</button>
+                <button id="copyNamesBtn" class="pixel-btn pixel-cut" type="button">명단 복사</button>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section class="settings-pane" data-settings-pane="data">
+          <div class="modal-copy">현재 설정, 명단, 좌석 배치를 JSON 파일로 저장하거나 다시 불러올 수 있습니다.</div>
+          <div class="modal-actions" style="justify-content:flex-start">
+            <button id="exportDataBtn" class="pixel-btn pixel-cut" type="button">데이터 내보내기</button>
+            <button id="importDataBtn" class="pixel-btn pixel-cut" type="button">데이터 불러오기</button>
+            <button id="clearRecentBtn" class="pixel-btn pixel-cut" type="button">최근 알림 삭제</button>
+            <button id="resetAllBtn" class="pixel-btn pixel-cut" type="button">전체 초기화</button>
+          </div>
+          <input id="importFileInput" class="hidden" type="file" accept="application/json" />
+        </section>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button id="closeSettingsBtn" class="pixel-btn pixel-cut" type="button">설정 닫기</button>
+    </div>
+  </section>
+</div>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script>
+(() => {
+  'use strict';
+
+  const INITIAL_CLASSES = [{"id": "3-1", "title": "3학년 1반", "names": ["1번", "2번", "3번", "4번", "5번", "6번", "7번", "8번", "9번", "10번", "11번", "12번", "13번", "14번", "15번", "16번", "17번", "18번", "19번", "20번", "21번", "22번", "23번", "24번"]}, {"id": "4-1", "title": "4학년 1반", "names": ["1번", "2번", "3번", "4번", "5번", "6번", "7번", "8번", "9번", "10번", "11번", "12번", "13번", "14번", "15번", "16번", "17번", "18번", "19번", "20번", "21번", "22번", "23번", "24번"]}, {"id": "4-2", "title": "4학년 2반", "names": ["1번", "2번", "3번", "4번", "5번", "6번", "7번", "8번", "9번", "10번", "11번", "12번", "13번", "14번", "15번", "16번", "17번", "18번", "19번", "20번", "21번", "22번", "23번", "24번"]}, {"id": "4-3", "title": "4학년 3반", "names": ["1번", "2번", "3번", "4번", "5번", "6번", "7번", "8번", "9번", "10번", "11번", "12번", "13번", "14번", "15번", "16번", "17번", "18번", "19번", "20번", "21번", "22번", "23번", "24번"]}, {"id": "4-4", "title": "4학년 4반", "names": ["1번", "2번", "3번", "4번", "5번", "6번", "7번", "8번", "9번", "10번", "11번", "12번", "13번", "14번", "15번", "16번", "17번", "18번", "19번", "20번", "21번", "22번", "23번", "24번"]}, {"id": "4-5", "title": "4학년 5반", "names": ["1번", "2번", "3번", "4번", "5번", "6번", "7번", "8번", "9번", "10번", "11번", "12번", "13번", "14번", "15번", "16번", "17번", "18번", "19번", "20번", "21번", "22번", "23번", "24번"]}, {"id": "4-6", "title": "4학년 6반", "names": ["1번", "2번", "3번", "4번", "5번", "6번", "7번", "8번", "9번", "10번", "11번", "12번", "13번", "14번", "15번", "16번", "17번", "18번", "19번", "20번", "21번", "22번", "23번", "24번"]}, {"id": "4-7", "title": "4학년 7반", "names": ["1번", "2번", "3번", "4번", "5번", "6번", "7번", "8번", "9번", "10번", "11번", "12번", "13번", "14번", "15번", "16번", "17번", "18번", "19번", "20번", "21번", "22번", "23번", "24번"]}, {"id": "4-8", "title": "4학년 8반", "names": ["1번", "2번", "3번", "4번", "5번", "6번", "7번", "8번", "9번", "10번", "11번", "12번", "13번", "14번", "15번", "16번", "17번", "18번", "19번", "20번", "21번", "22번", "23번", "24번"]}];
+
+  const EMBEDDED_BACKUP = {};
+
+  const CLEANUP_STEPS = [
+    { id:'desk', title:'책상 줄 맞추기', message:'앞뒤와 옆줄을 반듯하게 맞춰요.', seconds:60, icon:'▦' },
+    { id:'floor', title:'바닥 확인하기', message:'내 자리 주변과 통로를 살펴봐요.', seconds:30, icon:'⌕' },
+    { id:'trash', title:'쓰레기 줍기', message:'보이는 쓰레기를 주워 휴지통에 넣어요.', seconds:90, icon:'♲' }
+  ];
+
+  const NOTICE_PRESETS = [
+    '조용히 해 주세요.', '교과서를 펼쳐 주세요.', '활동지를 준비하세요.', '모둠별로 앉아 주세요.',
+    '발표를 경청하세요.', '제출물을 확인하세요.', '수업 준비를 시작하세요.', '이동할 준비를 하세요.',
+    '선생님을 바라보세요.', '잠시 기다려 주세요.'
+  ];
+  const QUICK_TIMES = [30,60,120,180,300,600,900,1200];
+  const HOME_ENGLISH_MESSAGES = [
+    "Let's have a great English class today!",
+    "Ready, set, learn English!",
+    "Be brave, speak English, and have fun!",
+    "Mistakes help us learn and grow.",
+    "Small steps make big progress.",
+    "Listen carefully and speak confidently.",
+    "Let's learn, laugh, and do our best!",
+    "You can do amazing things today!",
+    "Kind words make a happy classroom.",
+    "Try your best and enjoy the journey."
+  ];
+  const MUSIC_TRACKS = [
+    { id:'break', label:'쉬는시간', sub:'BREAK TIME BGM', file:'쉬는시간(2).mp3' },
+    { id:'activity', label:'활동시간', sub:'ACTIVITY TIME BGM', file:'활동시간(2).mp3' },
+    { id:'personal', label:'개인업무', sub:'PERSONAL WORK BGM', file:'개인업무(1).mp3' }
+  ];
+  const STORAGE_KEY = 'culture-club-classroom-v1';
+  const SAFETY_STORAGE_KEY = 'culture-club-classroom-v1-safety';
+  const LEGACY_STORAGE_KEY = 'culture-club-classroom-no-legacy';
+  const MAX_SEATS = 24;
+  const COLS = 6;
+  const ROWS = 4;
+
+  const cloneInitialClasses = () => INITIAL_CLASSES.map(c => ({...c, names:[...c.names]}));
+  const defaultState = () => ({
+    settings: {
+      timeFormat: 12,
+      showSeconds: false,
+      muted: false,
+      volume: .7,
+      brightness: 1,
+      highContrast: false,
+      defaultMessage: HOME_ENGLISH_MESSAGES[0],
+      homeMessageMode: 'randomEnglish',
+      showBoot: true,
+      workspacePreset: 'seating-random'
+    },
+    selectedClass: '3-1',
+    classes: cloneInitialClasses(),
+    seatLayouts: {},
+    studentDrawState: {},
+    workspaceNotice: {title:'수업 안내', message:'교과서를 펼쳐 주세요.'},
+    recentNotices: [],
+    lastTimerTitle: '문제 풀기'
+  });
+
+  function mergeSavedState(saved, fallback){
+    return {
+      ...fallback,
+      ...saved,
+      settings: {...fallback.settings, ...(saved.settings || {})},
+      classes: Array.isArray(saved.classes) && saved.classes.length === 9 ? saved.classes : fallback.classes,
+      seatLayouts: saved.seatLayouts || {},
+      studentDrawState: saved.studentDrawState || {},
+      workspaceNotice: {...fallback.workspaceNotice, ...(
+        saved.workspaceNotice || (Array.isArray(saved.recentNotices) && saved.recentNotices[0]
+          ? {title:saved.recentNotices[0].title, message:saved.recentNotices[0].message}
+          : {})
+      )},
+      recentNotices: Array.isArray(saved.recentNotices) ? saved.recentNotices.slice(0,10) : []
+    };
+  }
+
+  function loadState(){
+    const fallback = defaultState();
+    for(const key of [STORAGE_KEY, SAFETY_STORAGE_KEY]){
+      try {
+        const raw = localStorage.getItem(key);
+        if(raw) return mergeSavedState(JSON.parse(raw), fallback);
+      } catch(err){ console.warn(`${key} 데이터 불러오기 실패`, err); }
+    }
+    try {
+      const legacyRaw = localStorage.getItem(LEGACY_STORAGE_KEY);
+      if(legacyRaw){
+        const legacyClasses = JSON.parse(legacyRaw);
+        if(Array.isArray(legacyClasses) && legacyClasses.length === 9) fallback.classes = legacyClasses;
+      }
+    } catch(err){ console.warn('이전 명단 불러오기 실패', err); }
+    return mergeSavedState(EMBEDDED_BACKUP, fallback);
+  }
+
+  const persisted = loadState();
+  const state = {
+    view: 'home',
+    selectedClassIndex: Math.max(0, persisted.classes.findIndex(c => c.id === persisted.selectedClass)),
+    settingsClassIndex: 0,
+    isShuffling: false,
+    seatEditMode: false,
+    selectedSeatIndex: null,
+    timer: {
+      mode: null,
+      title: '',
+      subtitle: '',
+      totalSeconds: 0,
+      remainingSeconds: 0,
+      endTime: null,
+      running: false,
+      paused: false,
+      warned60: false,
+      lastTickSecond: null
+    },
+    cleanup: { stepIndex: 0, completedSeconds: 0 },
+    noticeTimeout: null,
+    toastTimeout: null,
+    wakeLock: null,
+    bgmAudio: null,
+    currentTrackId: persisted.settings.lastMusicTrack || '',
+    homeMessageIndex: -1,
+    groupDrawOrder: [],
+    groupDrawn: [],
+    isDrawing: false,
+    timerSetupReturnView: 'home',
+    workspaceImageBlob: null
+  };
+
+  const $ = id => document.getElementById(id);
+  const els = {
+    bootScreen: $('bootScreen'), appShell: $('appShell'), currentModeLabel: $('currentModeLabel'),
+    headerTime: $('headerTime'), headerDate: $('headerDate'), mainClock: $('mainClock'), mainDate: $('mainDate'),
+    defaultMessageBox: $('defaultMessageBox'), homeClassLabel: $('homeClassLabel'), soundBtn: $('soundBtn'), soundIcon: $('soundIcon'), settingsBtn: $('settingsBtn'),
+    views: [...document.querySelectorAll('.view')], dockButtons: [...document.querySelectorAll('.dock-btn[data-action]')],
+    timerView: $('timerView'), timerHeading: $('timerHeading'), timerSubtitle: $('timerSubtitle'), timerStateBadge: $('timerStateBadge'), timerNumber: $('timerNumber'), timerMessage: $('timerMessage'), timerPercent: $('timerPercent'), timerProgressFill: $('timerProgressFill'), timerSideInfo: $('timerSideInfo'),
+    pauseResumeBtn: $('pauseResumeBtn'), restartTimerBtn: $('restartTimerBtn'), minusMinuteBtn: $('minusMinuteBtn'), plusMinuteBtn: $('plusMinuteBtn'), plusTenBtn: $('plusTenBtn'), stopTimerBtn: $('stopTimerBtn'),
+    cleanupSteps: $('cleanupSteps'), cleanupIcon: $('cleanupIcon'), cleanupTitle: $('cleanupTitle'), cleanupMessage: $('cleanupMessage'), cleanupTime: $('cleanupTime'), cleanupPercent: $('cleanupPercent'), cleanupProgressFill: $('cleanupProgressFill'), cleanupStateBadge: $('cleanupStateBadge'), cleanupPauseBtn: $('cleanupPauseBtn'), cleanupPrevBtn: $('cleanupPrevBtn'), cleanupNextBtn: $('cleanupNextBtn'), cleanupRestartStepBtn: $('cleanupRestartStepBtn'), cleanupRestartAllBtn: $('cleanupRestartAllBtn'), cleanupStopBtn: $('cleanupStopBtn'),
+    classTabs: $('classTabs'), seatClassTitle: $('seatClassTitle'), seatCount: $('seatCount'), deskGrid: $('deskGrid'), shuffleSeatsBtn: $('shuffleSeatsBtn'), moveSeatsBtn: $('moveSeatsBtn'), seatEditHint: $('seatEditHint'), resetLayoutBtn: $('resetLayoutBtn'), openNamesBtn: $('openNamesBtn'), studentFocus: $('studentFocus'), studentFocusName: $('studentFocusName'), studentFocusClose: $('studentFocusClose'),
+    workspaceView: $('workspaceView'), workspacePanelA: $('workspacePanelA'), workspacePanelB: $('workspacePanelB'), workspacePresetButtons: [...document.querySelectorAll('.workspace-preset')],
+    randomPickerOverlay: $('randomPickerOverlay'), groupChips: $('groupChips'), groupOrderText: $('groupOrderText'), groupDrawResult: $('groupDrawResult'), drawGroupBtn: $('drawGroupBtn'), resetGroupDrawBtn: $('resetGroupDrawBtn'), studentDrawClass: $('studentDrawClass'), studentDrawStatus: $('studentDrawStatus'), studentDrawHistory: $('studentDrawHistory'), studentDrawResult: $('studentDrawResult'), drawStudentBtn: $('drawStudentBtn'), resetStudentDrawBtn: $('resetStudentDrawBtn'), closeRandomPickerBtn: $('closeRandomPickerBtn'),
+    miniTimer: $('miniTimer'), miniTimerTitle: $('miniTimerTitle'), miniTimerValue: $('miniTimerValue'),
+    timerSetupOverlay: $('timerSetupOverlay'), customTimerTitle: $('customTimerTitle'), quickTimes: $('quickTimes'), customMinutes: $('customMinutes'), customSeconds: $('customSeconds'), closeTimerSetupBtn: $('closeTimerSetupBtn'), startCustomTimerBtn: $('startCustomTimerBtn'),
+    noticeEditorOverlay: $('noticeEditorOverlay'), noticeTitleInput: $('noticeTitleInput'), noticeDuration: $('noticeDuration'), noticeTone: $('noticeTone'), noticeIcon: $('noticeIcon'), noticeMessageInput: $('noticeMessageInput'), noticePresets: $('noticePresets'), recentNotices: $('recentNotices'), closeNoticeEditorBtn: $('closeNoticeEditorBtn'), showNoticeBtn: $('showNoticeBtn'),
+    noticeOverlay: $('noticeOverlay'), noticeCard: $('noticeCard'), noticeCloseBtn: $('noticeCloseBtn'), noticePin: $('noticePin'), noticeDisplayTitle: $('noticeDisplayTitle'), noticeDisplayMessage: $('noticeDisplayMessage'),
+    choiceOverlay: $('choiceOverlay'), choiceTitle: $('choiceTitle'), choiceMessage: $('choiceMessage'), choiceActions: $('choiceActions'),
+    settingsOverlay: $('settingsOverlay'), settingsTabs: [...document.querySelectorAll('.settings-tab')], settingsPanes: [...document.querySelectorAll('.settings-pane')], closeSettingsBtn: $('closeSettingsBtn'),
+    timeFormatToggle: $('timeFormatToggle'), secondsToggle: $('secondsToggle'), contrastToggle: $('contrastToggle'), bootToggle: $('bootToggle'), brightnessRange: $('brightnessRange'), soundToggle: $('soundToggle'), volumeRange: $('volumeRange'), testSoundBtn: $('testSoundBtn'), defaultMessageInput: $('defaultMessageInput'), saveDefaultMessageBtn: $('saveDefaultMessageBtn'), settingsClassButtons: $('settingsClassButtons'), settingsClassTitle: $('settingsClassTitle'), settingsNamesInput: $('settingsNamesInput'), settingsNameCount: $('settingsNameCount'), saveNamesBtn: $('saveNamesBtn'), resetNamesBtn: $('resetNamesBtn'), copyNamesBtn: $('copyNamesBtn'), exportDataBtn: $('exportDataBtn'), importDataBtn: $('importDataBtn'), importFileInput: $('importFileInput'), clearRecentBtn: $('clearRecentBtn'), resetAllBtn: $('resetAllBtn'),
+    fullscreenBtn: $('fullscreenBtn'), toast: $('toast'),
+    musicButtons: $('musicButtons'), musicStopBtn: $('musicStopBtn'), musicStatus: $('musicStatus')
+  };
+
+  let audioCtx = null;
+  let masterGain = null;
+  let tickLoop = null;
+
+  function savePersisted(){
+    try {
+      persisted.selectedClass = persisted.classes[state.selectedClassIndex]?.id || '3-1';
+      const previous = localStorage.getItem(STORAGE_KEY);
+      if(previous) localStorage.setItem(SAFETY_STORAGE_KEY, previous);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(persisted));
+    } catch(err){ showToast('저장 공간을 사용할 수 없습니다.'); }
+  }
+
+  function showToast(message){
+    clearTimeout(state.toastTimeout);
+    els.toast.textContent = message;
+    els.toast.classList.add('show');
+    state.toastTimeout = setTimeout(() => els.toast.classList.remove('show'), 2200);
+  }
+
+  function renderGroupDraw(){
+    els.groupChips.innerHTML = '';
+    for(let group = 1; group <= 6; group++){
+      const chip = document.createElement('span');
+      chip.className = 'group-chip' + (state.groupDrawn.includes(group) ? ' drawn' : '');
+      const position = state.groupDrawn.indexOf(group);
+      chip.textContent = group;
+      chip.title = position >= 0 ? `${group}모둠 · ${position + 1}번째` : `${group}모둠 · 아직 안 뽑힘`;
+      els.groupChips.appendChild(chip);
+    }
+    els.groupOrderText.textContent = state.groupDrawn.length
+      ? `순서: ${state.groupDrawn.map(group => `${group}모둠`).join(' → ')}`
+      : '순서: 아직 뽑지 않았어요';
+    els.drawGroupBtn.textContent = state.groupDrawn.length >= 6 ? '새 순서 다시 뽑기' : '다음 모둠 뽑기';
+  }
+
+  function resetGroupDraw(){
+    if(state.isDrawing) return;
+    state.groupDrawOrder = [];
+    state.groupDrawn = [];
+    els.groupDrawResult.textContent = 'READY';
+    renderGroupDraw();
+    updateWorkspaceRandom('READY');
+  }
+
+  function getStudentDrawState(cls = getCurrentClass()){
+    if(!persisted.studentDrawState) persisted.studentDrawState = {};
+    const names = cls.names.filter(Boolean);
+    const valid = new Set(names);
+    const saved = persisted.studentDrawState[cls.id];
+    if(!saved || !Array.isArray(saved.remaining) || !Array.isArray(saved.drawn)){
+      persisted.studentDrawState[cls.id] = {remaining:[...names], drawn:[]};
+      return persisted.studentDrawState[cls.id];
+    }
+    saved.drawn = [...new Set(saved.drawn.filter(name => valid.has(name)))];
+    saved.remaining = [...new Set(saved.remaining.filter(name => valid.has(name) && !saved.drawn.includes(name)))];
+    names.forEach(name => {
+      if(!saved.drawn.includes(name) && !saved.remaining.includes(name)) saved.remaining.push(name);
+    });
+    return saved;
+  }
+
+  function renderStudentDraw(){
+    const cls = getCurrentClass();
+    const drawState = getStudentDrawState(cls);
+    els.studentDrawClass.textContent = `${cls.title} · 중복 없이 한 번씩`;
+    els.studentDrawStatus.textContent = `${drawState.remaining.length}명 남음 · ${drawState.drawn.length}명 뽑음`;
+    els.studentDrawHistory.textContent = drawState.drawn.length
+      ? `뽑힌 학생: ${drawState.drawn.slice(-8).join(' · ')}${drawState.drawn.length > 8 ? ' …' : ''}`
+      : '아직 뽑은 학생이 없어요.';
+    els.drawStudentBtn.disabled = state.isDrawing || drawState.remaining.length === 0;
+    els.drawStudentBtn.textContent = drawState.remaining.length ? '학생 뽑기' : '모두 뽑았어요';
+  }
+
+  function resetStudentDraw(){
+    if(state.isDrawing) return;
+    const cls = getCurrentClass();
+    persisted.studentDrawState[cls.id] = {remaining:[...cls.names.filter(Boolean)], drawn:[]};
+    savePersisted();
+    els.studentDrawResult.textContent = 'READY';
+    renderStudentDraw();
+    updateWorkspaceRandom('READY');
+    showToast(`${cls.title} 학생 뽑기를 초기화했습니다.`);
+  }
+
+  function openRandomPicker(){
+    const cls = getCurrentClass();
+    els.studentDrawResult.textContent = 'READY';
+    renderGroupDraw();
+    renderStudentDraw();
+    els.randomPickerOverlay.classList.add('show');
+  }
+
+  function closeRandomPicker(){
+    if(state.isDrawing) return;
+    els.randomPickerOverlay.classList.remove('show');
+  }
+
+  function drawNextGroup(){
+    if(state.isDrawing) return;
+    initAudio();
+    if(state.groupDrawn.length >= 6) resetGroupDraw();
+    if(!state.groupDrawOrder.length) state.groupDrawOrder = shuffle([1,2,3,4,5,6]);
+    const remaining = state.groupDrawOrder.slice(state.groupDrawn.length);
+    const finalGroup = state.groupDrawOrder[state.groupDrawn.length];
+    state.isDrawing = true;
+    els.drawGroupBtn.disabled = true;
+    let ticks = 0;
+    const spin = setInterval(() => {
+      els.groupDrawResult.textContent = `${remaining[ticks % remaining.length]}모둠`;
+      updateWorkspaceRandom(`${remaining[ticks % remaining.length]}모둠`);
+      playDrawTickSound(ticks);
+      ticks++;
+      if(ticks >= 18){
+        clearInterval(spin);
+        state.groupDrawn.push(finalGroup);
+        els.groupDrawResult.textContent = `${finalGroup}모둠`;
+        renderGroupDraw();
+        els.drawGroupBtn.disabled = false;
+        state.isDrawing = false;
+        updateWorkspaceRandom(`${finalGroup}모둠`);
+        playSelectedSound();
+      }
+    }, 65);
+  }
+
+  function drawStudent(){
+    if(state.isDrawing) return;
+    const cls = getCurrentClass();
+    const drawState = getStudentDrawState(cls);
+    const names = drawState.remaining;
+    if(!cls.names.length){ showToast('현재 반 명단을 먼저 입력해 주세요.'); return; }
+    if(!names.length){ showToast('모든 학생을 한 번씩 뽑았습니다. 학생 초기화를 눌러 주세요.'); return; }
+    initAudio();
+    state.isDrawing = true;
+    els.drawStudentBtn.disabled = true;
+    let ticks = 0;
+    const finalName = names[Math.floor(Math.random() * names.length)];
+    const spin = setInterval(() => {
+      const rollingName = names[Math.floor(Math.random() * names.length)];
+      els.studentDrawResult.textContent = rollingName;
+      updateWorkspaceRandom(rollingName);
+      playDrawTickSound(ticks);
+      ticks++;
+      if(ticks >= 20){
+        clearInterval(spin);
+        drawState.remaining = drawState.remaining.filter(name => name !== finalName);
+        drawState.drawn.push(finalName);
+        savePersisted();
+        els.studentDrawResult.textContent = finalName;
+        state.isDrawing = false;
+        renderStudentDraw();
+        updateWorkspaceRandom(finalName);
+        playSelectedSound();
+      }
+    }, 60);
+  }
+
+  function cleanNames(text){
+    return text.split(/\n|,/).map(v => v.trim()).filter(Boolean).slice(0, MAX_SEATS);
+  }
+
+  function shuffle(array){
+    const a = [...array];
+    for(let i = a.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function buildSeats(names, randomize=false){
+    const list = randomize ? shuffle(names) : [...names];
+    const emptyCount = Math.max(0, MAX_SEATS - list.length);
+    const emptySlots = new Set();
+    const emptyOrder = [];
+    for(let r = ROWS - 1; r >= 0; r--){
+      for(let c = 0; c < COLS; c++) emptyOrder.push(r * COLS + c);
+    }
+    for(let i = 0; i < emptyCount; i++) emptySlots.add(emptyOrder[i]);
+    const seats = Array(MAX_SEATS).fill(null);
+    let idx = 0;
+    for(let i = 0; i < MAX_SEATS; i++){
+      if(!emptySlots.has(i)) seats[i] = list[idx++] || null;
+    }
+    return seats;
+  }
+
+  function getCurrentClass(){ return persisted.classes[state.selectedClassIndex]; }
+  function getLayoutForClass(cls){
+    const saved = persisted.seatLayouts[cls.id];
+    if(Array.isArray(saved) && saved.length === MAX_SEATS){
+      const validNames = new Set(cls.names);
+      const filtered = saved.map(n => validNames.has(n) ? n : null);
+      const missing = cls.names.filter(n => !filtered.includes(n));
+      for(let i = 0; i < filtered.length && missing.length; i++) if(filtered[i] === null) filtered[i] = missing.shift();
+      return filtered;
+    }
+    return buildSeats(cls.names, false);
+  }
+
+  function formatTimer(seconds){
+    const s = Math.max(0, Math.ceil(seconds));
+    const m = Math.floor(s / 60);
+    const r = s % 60;
+    return `${m}:${String(r).padStart(2,'0')}`;
+  }
+
+  function getClockStrings(date = new Date()){
+    const hour24 = date.getHours();
+    const minute = date.getMinutes();
+    const second = date.getSeconds();
+    let time;
+    if(persisted.settings.timeFormat === 24){
+      time = `${String(hour24).padStart(2,'0')}:${String(minute).padStart(2,'0')}`;
+    } else {
+      const ap = hour24 < 12 ? 'AM' : 'PM';
+      const h = hour24 % 12 || 12;
+      time = `${ap} ${String(h).padStart(2,'0')}:${String(minute).padStart(2,'0')}`;
+    }
+    if(persisted.settings.showSeconds) time += `:${String(second).padStart(2,'0')}`;
+    const daysEn = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
+    const daysKo = ['일요일','월요일','화요일','수요일','목요일','금요일','토요일'];
+    const dateEn = `${date.getFullYear()}. ${String(date.getMonth()+1).padStart(2,'0')}. ${String(date.getDate()).padStart(2,'0')}. ${daysEn[date.getDay()]}`;
+    const dateKo = `${date.getFullYear()}년 ${date.getMonth()+1}월 ${date.getDate()}일 ${daysKo[date.getDay()]}`;
+    return {time, dateEn, dateKo};
+  }
+
+  function updateClock(){
+    const t = getClockStrings();
+    els.headerTime.textContent = t.time;
+    els.headerDate.textContent = t.dateEn;
+    els.mainClock.textContent = t.time;
+    els.mainDate.textContent = t.dateKo;
+  }
+
+  function setView(view){
+    state.view = view;
+    els.views.forEach(v => v.classList.toggle('active', v.dataset.view === view));
+    const modeLabels = {home:'HOME', timer:'TIMER', cleanup:'CLEAN-UP QUEST', seating:'SEATING MAP', workspace:'MULTI VIEW'};
+    els.currentModeLabel.textContent = modeLabels[view] || view.toUpperCase();
+    els.dockButtons.forEach(btn => {
+      const action = btn.dataset.action;
+      const timerAction = 'customTimer';
+      const active = (view === 'home' && action === 'home') || (view === 'seating' && action === 'seating') || (view === 'workspace' && action === 'workspace') || (view === 'cleanup' && action === 'cleanup') || (view === 'timer' && action === timerAction);
+      btn.classList.toggle('active', active);
+    });
+    if(view === 'home') updateHomeMessage(true);
+    if(view === 'workspace') renderWorkspace();
+    updateMiniTimer();
+  }
+
+
+  function updateHomeMessage(force=false){
+    const customMode = persisted.settings.homeMessageMode === 'custom';
+    const customText = String(persisted.settings.defaultMessage || '').trim();
+    if(customMode && customText){
+      els.defaultMessageBox.textContent = customText;
+      return;
+    }
+    if(force || state.homeMessageIndex < 0){
+      let nextIndex = Math.floor(Math.random() * HOME_ENGLISH_MESSAGES.length);
+      if(HOME_ENGLISH_MESSAGES.length > 1 && nextIndex === state.homeMessageIndex){
+        nextIndex = (nextIndex + 1) % HOME_ENGLISH_MESSAGES.length;
+      }
+      state.homeMessageIndex = nextIndex;
+    }
+    els.defaultMessageBox.textContent = HOME_ENGLISH_MESSAGES[state.homeMessageIndex] || HOME_ENGLISH_MESSAGES[0];
+  }
+
+  function applySettings(){
+    document.documentElement.style.setProperty('--screen-brightness', persisted.settings.brightness);
+    document.body.classList.toggle('high-contrast', !!persisted.settings.highContrast);
+    updateHomeMessage(false);
+    els.defaultMessageInput.value = persisted.settings.homeMessageMode === 'custom' ? (persisted.settings.defaultMessage || '') : '';
+    els.timeFormatToggle.classList.toggle('on', persisted.settings.timeFormat === 24);
+    els.secondsToggle.classList.toggle('on', !!persisted.settings.showSeconds);
+    els.contrastToggle.classList.toggle('on', !!persisted.settings.highContrast);
+    els.bootToggle.classList.toggle('on', !!persisted.settings.showBoot);
+    els.soundToggle.classList.toggle('on', !persisted.settings.muted);
+    els.brightnessRange.value = persisted.settings.brightness;
+    els.volumeRange.value = persisted.settings.volume;
+    els.soundIcon.textContent = persisted.settings.muted ? '×' : '♪';
+    if(state.bgmAudio){
+      state.bgmAudio.volume = persisted.settings.volume;
+      state.bgmAudio.muted = !!persisted.settings.muted;
+    }
+    updateMusicUI();
+    updateClock();
+  }
+
+
+  function ensureBgmAudio(){
+    if(state.bgmAudio) return state.bgmAudio;
+    const audio = new Audio();
+    audio.loop = true;
+    audio.preload = 'metadata';
+    audio.volume = persisted.settings.volume;
+    audio.muted = !!persisted.settings.muted;
+    audio.addEventListener('play', updateMusicUI);
+    audio.addEventListener('pause', updateMusicUI);
+    audio.addEventListener('ended', updateMusicUI);
+    audio.addEventListener('error', () => {
+      showToast('음악 파일을 찾을 수 없습니다. HTML과 mp3 파일을 같은 폴더에 두어 주세요.');
+      updateMusicUI();
+    });
+    state.bgmAudio = audio;
+    return audio;
+  }
+
+  function getMusicTrack(trackId){
+    return MUSIC_TRACKS.find(track => track.id === trackId) || null;
+  }
+
+  function updateMusicUI(){
+    if(els.musicStopBtn) els.musicStopBtn.disabled = true;
+    if(els.musicStatus) els.musicStatus.textContent = 'BGM 음원 파일이 아직 없어요. 타이머 알림음은 사용할 수 있어요.';
+  }
+
+  function playSelectedTrack(trackId){
+    const track = getMusicTrack(trackId);
+    if(!track) return;
+    const audio = ensureBgmAudio();
+    const src = encodeURI(track.file);
+    if(state.currentTrackId !== trackId || !audio.src || !audio.src.includes(encodeURIComponent(track.file))){
+      audio.src = src;
+    }
+    state.currentTrackId = trackId;
+    persisted.settings.lastMusicTrack = trackId;
+    audio.volume = persisted.settings.volume;
+    audio.muted = !!persisted.settings.muted;
+    audio.play().then(() => {
+      savePersisted();
+      updateMusicUI();
+      showToast(`${track.label} 음악을 재생합니다.`);
+    }).catch(() => {
+      updateMusicUI();
+      showToast('음악 재생을 위해 화면을 한 번 눌러 주세요.');
+    });
+  }
+
+  function toggleMusicTrack(trackId){
+    const audio = ensureBgmAudio();
+    if(state.currentTrackId === trackId){
+      if(audio.paused) {
+        playSelectedTrack(trackId);
+      } else {
+        audio.pause();
+        savePersisted();
+        updateMusicUI();
+        showToast('배경음악을 일시정지했습니다.');
+      }
+      return;
+    }
+    playSelectedTrack(trackId);
+  }
+
+  function stopMusic(silent=false){
+    if(state.bgmAudio){
+      state.bgmAudio.pause();
+      state.bgmAudio.currentTime = 0;
+    }
+    state.currentTrackId = '';
+    persisted.settings.lastMusicTrack = '';
+    savePersisted();
+    updateMusicUI();
+    if(!silent) showToast('배경음악을 정지했습니다.');
+  }
+
+  function renderMusicButtons(){
+    if(!els.musicButtons) return;
+    els.musicButtons.innerHTML = '';
+    MUSIC_TRACKS.forEach(track => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'pixel-btn pixel-cut music-track';
+      button.dataset.trackId = track.id;
+      button.disabled = true;
+      button.title = 'BGM 음원 파일이 아직 추가되지 않았어요.';
+      button.innerHTML = `<span class="music-track-main">${track.label}</span><span class="music-track-sub">${track.sub}</span>`;
+      button.addEventListener('click', () => toggleMusicTrack(track.id));
+      els.musicButtons.appendChild(button);
+    });
+    updateMusicUI();
+  }
+
+  function initAudio(){
+    if(audioCtx) return;
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if(!AudioContextClass) return;
+    audioCtx = new AudioContextClass();
+    masterGain = audioCtx.createGain();
+    masterGain.gain.value = persisted.settings.volume;
+    masterGain.connect(audioCtx.destination);
+  }
+
+  function tone(frequency=660, duration=.12, type='square', gain=.16, delay=0){
+    if(persisted.settings.muted) return;
+    initAudio();
+    if(!audioCtx || !masterGain) return;
+    if(audioCtx.state === 'suspended') audioCtx.resume().catch(()=>{});
+    const osc = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    const start = audioCtx.currentTime + delay;
+    osc.type = type;
+    osc.frequency.setValueAtTime(frequency, start);
+    g.gain.setValueAtTime(0.0001, start);
+    g.gain.exponentialRampToValueAtTime(Math.max(.0001, gain), start + .015);
+    g.gain.exponentialRampToValueAtTime(.0001, start + duration);
+    osc.connect(g); g.connect(masterGain);
+    osc.start(start); osc.stop(start + duration + .03);
+  }
+
+  /* Offline-safe PCM effect set: no external audio files or network required. */
+  const sfxBuffers = Object.create(null);
+  const SFX_DATASET = {
+    roulette: {duration:.085, gain:.36},
+    selected: {duration:.78, gain:.46},
+    countdown: {duration:.13, gain:.34},
+    countdownUrgent: {duration:.19, gain:.42}
+  };
+
+  function buildSfxBuffer(name){
+    initAudio();
+    if(!audioCtx || !SFX_DATASET[name]) return null;
+    if(sfxBuffers[name]) return sfxBuffers[name];
+    const preset = SFX_DATASET[name];
+    const rate = audioCtx.sampleRate;
+    const length = Math.max(1, Math.floor(rate * preset.duration));
+    const buffer = audioCtx.createBuffer(1, length, rate);
+    const data = buffer.getChannelData(0);
+    const bellNotes = [523.25, 659.25, 783.99, 1046.5];
+    for(let i=0;i<length;i++){
+      const t = i / rate;
+      let sample = 0;
+      if(name === 'roulette'){
+        const sweep = 980 - 430 * (t / preset.duration);
+        const click = Math.sin(2*Math.PI*sweep*t) + .33*Math.sin(2*Math.PI*sweep*2.1*t);
+        const noise = (Math.random()*2-1) * .32;
+        sample = (click*.7 + noise) * Math.exp(-38*t);
+      } else if(name === 'selected'){
+        const starts = [0,.12,.25,.39];
+        for(let n=0;n<bellNotes.length;n++){
+          const local = t - starts[n];
+          if(local >= 0){
+            const env = Math.exp(-4.8*local) * Math.min(1,local/.012);
+            sample += env * (
+              Math.sin(2*Math.PI*bellNotes[n]*local) +
+              .34*Math.sin(2*Math.PI*bellNotes[n]*2.01*local) +
+              .13*Math.sin(2*Math.PI*bellNotes[n]*3.98*local)
+            ) * .32;
+          }
+        }
+      } else {
+        const urgent = name === 'countdownUrgent';
+        const base = urgent ? 880 : 660;
+        const attack = Math.min(1,t/.008);
+        const env = attack * Math.exp(-(urgent ? 13 : 19)*t);
+        sample = env * (
+          Math.sin(2*Math.PI*base*t) +
+          .24*Math.sin(2*Math.PI*base*2*t)
+        );
+        if(urgent && t > .095){
+          const t2=t-.095;
+          sample += .58*Math.exp(-22*t2)*Math.sin(2*Math.PI*1040*t2);
+        }
+      }
+      data[i] = Math.max(-1,Math.min(1,sample));
+    }
+    sfxBuffers[name] = buffer;
+    return buffer;
+  }
+
+  function playSfx(name, playbackRate=1){
+    if(persisted.settings.muted) return;
+    initAudio();
+    if(!audioCtx || !masterGain) return;
+    if(audioCtx.state === 'suspended') audioCtx.resume().catch(()=>{});
+    const buffer = buildSfxBuffer(name);
+    if(!buffer) return;
+    const source = audioCtx.createBufferSource();
+    const gain = audioCtx.createGain();
+    source.buffer = buffer;
+    source.playbackRate.value = playbackRate;
+    gain.gain.value = SFX_DATASET[name].gain;
+    source.connect(gain); gain.connect(masterGain);
+    source.start();
+  }
+
+  function playStartSound(){ tone(523,.09,'square',.12,0); tone(659,.1,'square',.12,.1); }
+  function playStepSound(){ tone(660,.08,'square',.11,0); tone(880,.1,'square',.11,.09); }
+  function playMinuteWarning(){ tone(740,.13,'square',.13,0); tone(740,.13,'square',.13,.2); }
+  function playEndSound(){ tone(523,.18,'square',.17,0); tone(659,.18,'square',.17,.2); tone(784,.3,'square',.18,.4); }
+  function playTick(secondsLeft=10){
+    playSfx(secondsLeft <= 3 ? 'countdownUrgent' : 'countdown');
+  }
+  function playDrawTickSound(step=0){
+    const rates = [.86,.94,1.02,1.1,1.18,1.27];
+    playSfx('roulette', rates[step % rates.length]);
+  }
+  function playSelectedSound(){
+    playSfx('selected');
+  }
+
+  function stopCurrentTimer(silent=false){
+    state.timer = {mode:null,title:'',subtitle:'',totalSeconds:0,remainingSeconds:0,endTime:null,running:false,paused:false,warned60:false,lastTickSecond:null};
+    state.cleanup = {stepIndex:0, completedSeconds:0};
+    els.timerView.classList.remove('danger-state');
+    updateMiniTimer();
+    updateWorkspaceTimer();
+    if(!silent) showToast('타이머를 종료했습니다.');
+  }
+
+  function askReplaceTimer(nextAction){
+    if(!state.timer.mode){ nextAction(); return; }
+    openChoice('TIMER RUNNING', '현재 실행 중인 타이머를 종료하고 새 타이머를 시작할까요?', [
+      {label:'새 타이머 시작', action:()=>{ closeChoice(); stopCurrentTimer(true); nextAction(); }},
+      {label:'기존 타이머 계속', action:()=>closeChoice()},
+      {label:'취소', action:()=>closeChoice()}
+    ]);
+  }
+
+  function startTimer({mode, title, subtitle='', seconds}){
+    state.timer = {
+      mode, title, subtitle, totalSeconds:seconds, remainingSeconds:seconds,
+      endTime:Date.now()+seconds*1000, running:true, paused:false, warned60:false, lastTickSecond:null
+    };
+    playStartSound();
+    renderTimer();
+    setView('timer');
+  }
+
+  function startCleanup(){
+    askReplaceTimer(() => {
+      state.cleanup = {stepIndex:0, completedSeconds:0};
+      const step = CLEANUP_STEPS[0];
+      state.timer = {
+        mode:'cleanup', title:step.title, subtitle:'CLEAN-UP QUEST', totalSeconds:step.seconds,
+        remainingSeconds:step.seconds, endTime:Date.now()+step.seconds*1000,
+        running:true, paused:false, warned60:false, lastTickSecond:null
+      };
+      playStartSound();
+      renderCleanup();
+      setView('cleanup');
+    });
+  }
+
+  function openTimerSetup(){
+    state.timerSetupReturnView = state.view;
+    askReplaceTimer(() => {
+      els.customTimerTitle.value = persisted.lastTimerTitle || '문제 풀기';
+      els.timerSetupOverlay.classList.add('show');
+      setTimeout(() => els.customTimerTitle.focus(), 50);
+    });
+  }
+
+  function startCustomTimer(){
+    const minutes = Math.max(0, Math.min(99, Number(els.customMinutes.value) || 0));
+    const secondsPart = Math.max(0, Math.min(59, Number(els.customSeconds.value) || 0));
+    const total = minutes * 60 + secondsPart;
+    if(total <= 0){ showToast('1초 이상의 시간을 입력해 주세요.'); return; }
+    const title = els.customTimerTitle.value.trim() || '타이머';
+    persisted.lastTimerTitle = title;
+    savePersisted();
+    closeOverlay(els.timerSetupOverlay);
+    startTimer({mode:'custom', title, subtitle:'CUSTOM TIMER', seconds:total});
+    if(state.timerSetupReturnView === 'workspace') setView('workspace');
+  }
+
+  function renderTimer(){
+    if(!state.timer.mode || state.timer.mode === 'cleanup') return;
+    const t = state.timer;
+    els.timerHeading.textContent = t.title;
+    els.timerSubtitle.textContent = t.subtitle || '활동 시간을 확인하세요.';
+    els.timerNumber.textContent = formatTimer(t.remainingSeconds);
+    const percent = t.totalSeconds ? Math.max(0, Math.min(100, (t.remainingSeconds / t.totalSeconds) * 100)) : 0;
+    els.timerPercent.textContent = `${Math.round(percent)}%`;
+    els.timerProgressFill.style.width = `${percent}%`;
+    els.timerStateBadge.textContent = t.paused ? 'PAUSED' : t.running ? 'RUNNING' : 'READY';
+    els.pauseResumeBtn.textContent = t.paused ? '계속' : '일시정지';
+    els.timerSideInfo.textContent = t.paused ? '타이머가 잠시 멈춰 있습니다.' : '타이머가 정확한 종료 시각을 기준으로 실행 중입니다.';
+    els.timerMessage.textContent = `${t.title} 활동을 진행하세요.`;
+    els.timerView.classList.toggle('danger-state', t.remainingSeconds <= 10 && t.remainingSeconds > 0);
+    updateMiniTimer();
+    updateWorkspaceTimer();
+  }
+
+  function renderCleanup(){
+    const idx = state.cleanup.stepIndex;
+    const step = CLEANUP_STEPS[idx];
+    els.cleanupSteps.innerHTML = '';
+    CLEANUP_STEPS.forEach((s,i) => {
+      const row = document.createElement('div');
+      row.className = 'quest-step' + (i === idx ? ' active' : '') + (i < idx ? ' done' : '');
+      row.innerHTML = `<span class="quest-cursor">${i < idx ? '✓' : i === idx ? '▶' : '·'}</span><span>${i+1}. ${s.title}</span>`;
+      els.cleanupSteps.appendChild(row);
+    });
+    els.cleanupIcon.textContent = step.icon;
+    els.cleanupTitle.textContent = step.title;
+    els.cleanupMessage.textContent = step.message;
+    els.cleanupTime.textContent = formatTimer(state.timer.remainingSeconds);
+    els.cleanupStateBadge.textContent = `STEP ${idx+1} / 3${state.timer.paused ? ' · PAUSED' : ''}`;
+    els.cleanupPauseBtn.textContent = state.timer.paused ? '계속' : '일시정지';
+    const elapsedCurrent = Math.max(0, step.seconds - state.timer.remainingSeconds);
+    const totalElapsed = state.cleanup.completedSeconds + elapsedCurrent;
+    const percent = Math.max(0, Math.min(100, totalElapsed / 180 * 100));
+    els.cleanupPercent.textContent = `${Math.round(percent)}%`;
+    els.cleanupProgressFill.style.width = `${percent}%`;
+    updateMiniTimer();
+    updateWorkspaceTimer();
+  }
+
+  function tickTimer(){
+    const t = state.timer;
+    if(!t.mode || !t.running || t.paused || !t.endTime) return;
+    const rem = Math.max(0, Math.ceil((t.endTime - Date.now()) / 1000));
+    if(rem !== t.remainingSeconds){
+      t.remainingSeconds = rem;
+      if(rem === 60 && !t.warned60 && t.mode !== 'cleanup'){
+        t.warned60 = true;
+        playMinuteWarning();
+      }
+      if(rem <= 10 && rem > 0 && rem !== t.lastTickSecond){
+        t.lastTickSecond = rem;
+        playTick(rem);
+      }
+      if(t.mode === 'cleanup') renderCleanup(); else renderTimer();
+    }
+    if(rem <= 0) handleTimerComplete();
+  }
+
+  function handleTimerComplete(){
+    if(state.timer.mode === 'cleanup'){
+      const currentStep = CLEANUP_STEPS[state.cleanup.stepIndex];
+      state.cleanup.completedSeconds += currentStep.seconds;
+      if(state.cleanup.stepIndex < CLEANUP_STEPS.length - 1){
+        state.cleanup.stepIndex += 1;
+        const next = CLEANUP_STEPS[state.cleanup.stepIndex];
+        state.timer.title = next.title;
+        state.timer.totalSeconds = next.seconds;
+        state.timer.remainingSeconds = next.seconds;
+        state.timer.endTime = Date.now() + next.seconds * 1000;
+        state.timer.running = true;
+        state.timer.paused = false;
+        state.timer.lastTickSecond = null;
+        playStepSound();
+        renderCleanup();
+      } else {
+        playEndSound();
+        state.timer.running = false;
+        state.timer.paused = false;
+        els.cleanupStateBadge.textContent = 'QUEST COMPLETE!';
+        els.cleanupIcon.textContent = '✓';
+        els.cleanupTitle.textContent = '정리 완료!';
+        els.cleanupMessage.textContent = '깨끗해진 교실을 한번 확인해요.';
+        els.cleanupTime.textContent = '0:00';
+        els.cleanupPercent.textContent = '100%';
+        els.cleanupProgressFill.style.width = '100%';
+        showNoticeDirect({title:'QUEST COMPLETE!', message:'정리 완료! 교실이 깨끗해졌어요.', tone:'yellow', duration:5, icon:'✓'});
+        setTimeout(() => { stopCurrentTimer(true); setView('home'); }, 5200);
+      }
+    } else {
+      playEndSound();
+      state.timer.running = false;
+      state.timer.paused = false;
+      state.timer.remainingSeconds = 0;
+      renderTimer();
+      els.timerStateBadge.textContent = 'TIME UP!';
+      showNoticeDirect({title:'TIME UP!', message:`${state.timer.title} 시간이 끝났습니다.`, tone:'dark', duration:5, icon:'!'});
+    }
+  }
+
+  function pauseResumeTimer(){
+    const t = state.timer;
+    if(!t.mode) return;
+    if(t.paused){
+      if(t.remainingSeconds <= 0) return;
+      t.endTime = Date.now() + t.remainingSeconds * 1000;
+      t.running = true; t.paused = false;
+      playStepSound();
+    } else {
+      t.remainingSeconds = Math.max(0, Math.ceil((t.endTime - Date.now()) / 1000));
+      t.running = false; t.paused = true;
+    }
+    if(t.mode === 'cleanup') renderCleanup(); else renderTimer();
+  }
+
+  function restartTimer(){
+    const t = state.timer;
+    if(!t.mode) return;
+    t.remainingSeconds = t.totalSeconds;
+    t.endTime = Date.now() + t.totalSeconds * 1000;
+    t.running = true; t.paused = false; t.warned60 = false; t.lastTickSecond = null;
+    playStartSound();
+    if(t.mode === 'cleanup') renderCleanup(); else renderTimer();
+  }
+
+  function adjustTimer(delta){
+    const t = state.timer;
+    if(!t.mode) return;
+    const newRemaining = Math.max(0, Math.min(99*60+59, t.remainingSeconds + delta));
+    t.remainingSeconds = newRemaining;
+    if(delta > 0) t.totalSeconds = Math.max(t.totalSeconds, newRemaining);
+    if(t.running && !t.paused) t.endTime = Date.now() + newRemaining * 1000;
+    if(t.mode === 'cleanup') renderCleanup(); else renderTimer();
+  }
+
+  function goCleanupStep(index){
+    index = Math.max(0, Math.min(CLEANUP_STEPS.length-1, index));
+    state.cleanup.stepIndex = index;
+    state.cleanup.completedSeconds = CLEANUP_STEPS.slice(0,index).reduce((sum,s)=>sum+s.seconds,0);
+    const step = CLEANUP_STEPS[index];
+    state.timer.mode = 'cleanup';
+    state.timer.title = step.title;
+    state.timer.totalSeconds = step.seconds;
+    state.timer.remainingSeconds = step.seconds;
+    state.timer.endTime = Date.now() + step.seconds*1000;
+    state.timer.running = true;
+    state.timer.paused = false;
+    state.timer.warned60 = false;
+    state.timer.lastTickSecond = null;
+    playStepSound();
+    renderCleanup();
+  }
+
+  function updateMiniTimer(){
+    const show = state.view === 'home' && !!state.timer.mode;
+    els.miniTimer.classList.toggle('show', show);
+    if(!show) return;
+    els.miniTimerTitle.textContent = state.timer.mode === 'cleanup' ? `정리 · ${CLEANUP_STEPS[state.cleanup.stepIndex].title}` : state.timer.title;
+    els.miniTimerValue.textContent = formatTimer(state.timer.remainingSeconds);
+  }
+
+  function openTimerViewFromMini(){
+    if(!state.timer.mode) return;
+    setView(state.timer.mode === 'cleanup' ? 'cleanup' : 'timer');
+  }
+
+  function requestHome(){
+    if(!state.timer.mode){ setView('home'); return; }
+    openChoice('HOME', '타이머가 실행 중입니다. 어떻게 할까요?', [
+      {label:'타이머 유지하고 홈으로', action:()=>{ closeChoice(); setView('home'); }},
+      {label:'타이머 종료', action:()=>{ closeChoice(); stopCurrentTimer(true); setView('home'); }},
+      {label:'취소', action:()=>closeChoice()}
+    ]);
+  }
+
+  function renderClassTabs(){
+    els.classTabs.innerHTML = '';
+    persisted.classes.forEach((cls, idx) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'class-tab pixel-cut' + (idx === state.selectedClassIndex ? ' active' : '');
+      btn.textContent = cls.id;
+      btn.title = cls.title;
+      btn.addEventListener('click', () => switchClass(idx));
+      els.classTabs.appendChild(btn);
+    });
+  }
+
+  function switchClass(index){
+    if(state.isShuffling) return;
+    state.seatEditMode = false;
+    state.selectedSeatIndex = null;
+    state.selectedClassIndex = index;
+    persisted.selectedClass = persisted.classes[index].id;
+    savePersisted();
+    renderClassTabs();
+    renderSeats();
+    renderStudentDraw();
+    if(state.view === 'workspace') renderWorkspace();
+    els.homeClassLabel.textContent = `현재 선택: ${persisted.classes[index].id}`;
+  }
+
+  function updateSeatEditUI(){
+    els.moveSeatsBtn.classList.toggle('active', state.seatEditMode);
+    els.moveSeatsBtn.textContent = state.seatEditMode ? '✓ 자리 이동 중' : '↔ 자리 이동';
+    els.seatEditHint.textContent = state.seatEditMode
+      ? (state.selectedSeatIndex === null ? '옮길 학생의 자리를 먼저 터치하세요.' : '이제 바꿀 자리나 빈자리를 터치하세요.')
+      : '자리 이동을 누른 뒤 학생 자리와 옮길 자리를 차례로 터치하세요.';
+  }
+
+  function toggleSeatEditMode(){
+    if(state.isShuffling) return;
+    state.seatEditMode = !state.seatEditMode;
+    state.selectedSeatIndex = null;
+    updateSeatEditUI();
+    renderSeats();
+  }
+
+  function handleSeatMove(index){
+    const cls = getCurrentClass();
+    const layout = getLayoutForClass(cls);
+    if(state.selectedSeatIndex === null){
+      if(!layout[index]){ showToast('먼저 학생이 있는 자리를 선택해 주세요.'); return; }
+      state.selectedSeatIndex = index;
+      updateSeatEditUI();
+      renderSeats(layout);
+      return;
+    }
+    if(state.selectedSeatIndex === index){
+      state.selectedSeatIndex = null;
+      updateSeatEditUI();
+      renderSeats(layout);
+      return;
+    }
+    [layout[state.selectedSeatIndex], layout[index]] = [layout[index], layout[state.selectedSeatIndex]];
+    persisted.seatLayouts[cls.id] = layout;
+    state.selectedSeatIndex = null;
+    savePersisted();
+    updateSeatEditUI();
+    renderSeats(layout);
+    if(state.view === 'workspace') renderWorkspace();
+    playSelectedSound();
+    showToast('자리를 이동하고 자동 저장했습니다.');
+  }
+
+  function renderSeats(layout = null, shuffling=false){
+    const cls = getCurrentClass();
+    const seats = layout || getLayoutForClass(cls);
+    els.seatClassTitle.textContent = `${cls.title} 자리표`;
+    els.seatCount.textContent = `${cls.names.length} / 24`;
+    els.deskGrid.innerHTML = '';
+    els.deskGrid.classList.remove('has-highlight');
+    els.deskGrid.classList.toggle('editing', state.seatEditMode);
+    seats.forEach((name, idx) => {
+      const seat = document.createElement('button');
+      seat.type = 'button';
+      seat.className = 'seat pixel-cut' + (name ? '' : ' empty') + (shuffling && name ? ' shuffling' : '') + (state.seatEditMode && state.selectedSeatIndex === idx ? ' move-selected' : '');
+      seat.disabled = !name && !state.seatEditMode;
+      seat.setAttribute('aria-label', name ? `${idx+1}번 자리 ${name}` : `${idx+1}번 빈 자리`);
+      const num = document.createElement('span'); num.className = 'seat-number'; num.textContent = idx+1;
+      const nm = document.createElement('span'); nm.className = 'seat-name'; nm.textContent = name || '';
+      if(name && name.length >= 5) nm.style.fontSize = 'clamp(28px,1.55vw,52px)';
+      seat.append(num,nm);
+      seat.addEventListener('click', () => state.seatEditMode ? handleSeatMove(idx) : (name ? focusStudent(name) : null));
+      els.deskGrid.appendChild(seat);
+    });
+    updateSeatEditUI();
+  }
+
+  function focusStudent(name){
+    els.studentFocusName.textContent = name;
+    els.studentFocus.classList.add('show');
+    const seats = [...els.deskGrid.querySelectorAll('.seat')];
+    seats.forEach(seat => seat.classList.toggle('highlighted', seat.textContent.includes(name)));
+    els.deskGrid.classList.add('has-highlight');
+  }
+
+  function closeStudentFocus(){
+    els.studentFocus.classList.remove('show');
+    els.deskGrid.classList.remove('has-highlight');
+    els.deskGrid.querySelectorAll('.seat').forEach(s => s.classList.remove('highlighted'));
+  }
+
+  function shuffleSeats(){
+    if(state.isShuffling) return;
+    const cls = getCurrentClass();
+    if(!cls.names.length){ showToast('이름을 먼저 입력해 주세요.'); return; }
+    state.seatEditMode = false;
+    state.selectedSeatIndex = null;
+    state.isShuffling = true;
+    els.shuffleSeatsBtn.disabled = true;
+    els.shuffleSeatsBtn.textContent = 'SHUFFLING...';
+    showNoticeDirect({title:'SHUFFLING...', message:'새로운 자리를 정하고 있습니다.', tone:'celadon', duration:3, icon:'▦'});
+    let ticks = 0;
+    const interval = setInterval(() => {
+      ticks++;
+      renderSeats(buildSeats(cls.names,true), true);
+      if(ticks >= 28) clearInterval(interval);
+    }, 95);
+    setTimeout(() => {
+      clearInterval(interval);
+      const finalSeats = buildSeats(cls.names,true);
+      persisted.seatLayouts[cls.id] = finalSeats;
+      savePersisted();
+      renderSeats(finalSeats,false);
+      if(state.view === 'workspace') renderWorkspace();
+      state.isShuffling = false;
+      els.shuffleSeatsBtn.disabled = false;
+      els.shuffleSeatsBtn.textContent = '▶ 자리 섞기';
+      playEndSound();
+      showNoticeDirect({title:'NEW SEATS!', message:'새로운 자리가 정해졌습니다.', tone:'yellow', duration:3, icon:'✓'});
+    }, 3000);
+  }
+
+  function resetCurrentLayout(){
+    const cls = getCurrentClass();
+    delete persisted.seatLayouts[cls.id];
+    savePersisted();
+    renderSeats();
+    if(state.view === 'workspace') renderWorkspace();
+    showToast('현재 반을 기본 배치로 되돌렸습니다.');
+  }
+
+  const WORKSPACE_PRESETS = {
+    'seating-random': ['seating','random'],
+    'random-timer': ['random','timer'],
+    'timer-seating': ['timer','seating'],
+    'notice-timer': ['notice','timer'],
+    'image-timer': ['image','timer'],
+    'image-seating': ['image','seating']
+  };
+
+  const WORKSPACE_IMAGE_DB = 'culture-club-classroom-image-v1';
+  const WORKSPACE_IMAGE_STORE = 'images';
+
+  function openWorkspaceImageDb(){
+    return new Promise((resolve,reject) => {
+      if(!window.indexedDB){ reject(new Error('IndexedDB unavailable')); return; }
+      const request = indexedDB.open(WORKSPACE_IMAGE_DB,1);
+      request.onupgradeneeded = () => {
+        const db = request.result;
+        if(!db.objectStoreNames.contains(WORKSPACE_IMAGE_STORE)) db.createObjectStore(WORKSPACE_IMAGE_STORE);
+      };
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error || new Error('DB open failed'));
+    });
+  }
+
+  async function readSavedWorkspaceImage(){
+    if(state.workspaceImageBlob) return state.workspaceImageBlob;
+    try {
+      const db = await openWorkspaceImageDb();
+      const blob = await new Promise((resolve,reject) => {
+        const request = db.transaction(WORKSPACE_IMAGE_STORE,'readonly').objectStore(WORKSPACE_IMAGE_STORE).get('current');
+        request.onsuccess = () => resolve(request.result || null);
+        request.onerror = () => reject(request.error);
+      });
+      db.close();
+      if(blob instanceof Blob) state.workspaceImageBlob = blob;
+      return state.workspaceImageBlob;
+    } catch(err){
+      console.warn('붙여넣은 그림 불러오기 실패',err);
+      return state.workspaceImageBlob;
+    }
+  }
+
+  async function saveWorkspaceImage(blob){
+    if(!(blob instanceof Blob) || !blob.type.startsWith('image/')) return;
+    state.workspaceImageBlob = blob;
+    try {
+      const db = await openWorkspaceImageDb();
+      await new Promise((resolve,reject) => {
+        const request = db.transaction(WORKSPACE_IMAGE_STORE,'readwrite').objectStore(WORKSPACE_IMAGE_STORE).put(blob,'current');
+        request.onsuccess = () => resolve();
+        request.onerror = () => reject(request.error);
+      });
+      db.close();
+    } catch(err){ console.warn('붙여넣은 그림 저장 실패',err); }
+    document.querySelectorAll('.workspace-image-board').forEach(showWorkspaceImage);
+    showToast('캡처 이미지를 붙여넣고 저장했습니다.');
+  }
+
+  async function clearWorkspaceImage(){
+    state.workspaceImageBlob = null;
+    try {
+      const db = await openWorkspaceImageDb();
+      await new Promise((resolve,reject) => {
+        const request = db.transaction(WORKSPACE_IMAGE_STORE,'readwrite').objectStore(WORKSPACE_IMAGE_STORE).delete('current');
+        request.onsuccess = () => resolve();
+        request.onerror = () => reject(request.error);
+      });
+      db.close();
+    } catch(err){ console.warn('붙여넣은 그림 삭제 실패',err); }
+    document.querySelectorAll('.workspace-image-board').forEach(showWorkspaceImage);
+    showToast('붙여넣은 그림을 지웠습니다.');
+  }
+
+  async function showWorkspaceImage(board){
+    if(!board || !board.isConnected) return;
+    const blob = await readSavedWorkspaceImage();
+    if(!board.isConnected) return;
+    board.innerHTML = '';
+    if(blob){
+      const img = document.createElement('img');
+      const objectUrl = URL.createObjectURL(blob);
+      img.alt = '클립보드에서 붙여넣은 수업 이미지';
+      img.src = objectUrl;
+      img.addEventListener('load',() => URL.revokeObjectURL(objectUrl),{once:true});
+      img.addEventListener('error',() => URL.revokeObjectURL(objectUrl),{once:true});
+      board.appendChild(img);
+    } else {
+      const guide = document.createElement('div');
+      guide.className = 'workspace-image-empty';
+      guide.innerHTML = '<strong>캡처 후 Ctrl + V</strong>이 영역을 클릭하고 클립보드의 그림을 붙여넣으세요.<div class="workspace-image-note">Windows 캡처: Win + Shift + S</div>';
+      board.appendChild(guide);
+    }
+  }
+
+  function imageFromClipboardData(data){
+    if(!data) return null;
+    for(const item of [...(data.items || [])]){
+      if(item.kind === 'file' && item.type.startsWith('image/')) return item.getAsFile();
+    }
+    for(const file of [...(data.files || [])]) if(file.type.startsWith('image/')) return file;
+    return null;
+  }
+
+  async function pasteWorkspaceImageFromApi(board){
+    board.focus();
+    if(!navigator.clipboard?.read){
+      showToast('그림 영역을 클릭하고 Ctrl+V를 눌러 주세요.');
+      return;
+    }
+    try {
+      const items = await navigator.clipboard.read();
+      for(const item of items){
+        const type = item.types.find(type => type.startsWith('image/'));
+        if(type){ await saveWorkspaceImage(await item.getType(type)); return; }
+      }
+      showToast('클립보드에 그림이 없습니다.');
+    } catch(err){
+      showToast('그림 영역을 클릭하고 Ctrl+V를 눌러 주세요.');
+    }
+  }
+
+  function updateWorkspaceRandom(value){
+    document.querySelectorAll('.workspace-random-result').forEach(el => { el.textContent = value; });
+    const drawState = getStudentDrawState();
+    document.querySelectorAll('.workspace-random-meta').forEach(el => {
+      el.textContent = `${getCurrentClass().title} · 학생 ${drawState.remaining.length}명 남음 · 모둠 ${state.groupDrawn.length}/6`;
+    });
+    document.querySelectorAll('.workspace-draw-student').forEach(btn => {
+      btn.disabled = state.isDrawing || drawState.remaining.length === 0;
+      btn.textContent = drawState.remaining.length ? '학생 뽑기' : '모두 뽑음';
+    });
+    document.querySelectorAll('.workspace-draw-group').forEach(btn => { btn.disabled = state.isDrawing; });
+  }
+
+  function updateWorkspaceTimer(){
+    const timer = state.timer;
+    document.querySelectorAll('.workspace-timer-number').forEach(el => {
+      el.textContent = timer.mode ? formatTimer(timer.remainingSeconds) : '--:--';
+    });
+    document.querySelectorAll('.workspace-timer-meta').forEach(el => {
+      el.textContent = timer.mode ? `${timer.title} · ${timer.paused ? '일시정지' : timer.running ? '진행 중' : '대기'}` : '실행 중인 타이머가 없습니다.';
+    });
+    document.querySelectorAll('.workspace-timer-pause').forEach(el => {
+      el.textContent = timer.paused ? '계속' : '일시정지';
+      el.disabled = !timer.mode;
+    });
+  }
+
+  function renderWorkspaceSeating(panel){
+    const cls = getCurrentClass();
+    const layout = getLayoutForClass(cls);
+    const title = document.createElement('div');
+    title.className = 'workspace-card-title';
+    title.textContent = `${cls.title} 자리표`;
+    const grid = document.createElement('div');
+    grid.className = 'workspace-seat-grid';
+    layout.forEach((name, index) => {
+      const seat = document.createElement('button');
+      seat.type = 'button';
+      seat.className = 'workspace-seat';
+      seat.textContent = name || '';
+      seat.title = `${index + 1}번 자리${name ? ` · ${name}` : ' · 빈자리'}`;
+      seat.disabled = !name;
+      if(name) seat.addEventListener('click', () => focusStudent(name));
+      grid.appendChild(seat);
+    });
+    panel.append(title, grid);
+  }
+
+  function renderWorkspaceRandom(panel){
+    panel.innerHTML = `
+      <div class="workspace-card-title">RANDOM PICK</div>
+      <div class="workspace-random-meta"></div>
+      <div class="workspace-random-result">READY</div>
+      <div class="workspace-random-actions">
+        <button class="pixel-btn pixel-cut workspace-draw-student" type="button">학생 뽑기</button>
+        <button class="pixel-btn pixel-cut workspace-draw-group" type="button">모둠 뽑기</button>
+        <button class="pixel-btn pixel-cut workspace-reset-student" type="button">학생 초기화</button>
+      </div>`;
+    panel.querySelector('.workspace-draw-student').addEventListener('click', drawStudent);
+    panel.querySelector('.workspace-draw-group').addEventListener('click', drawNextGroup);
+    panel.querySelector('.workspace-reset-student').addEventListener('click', resetStudentDraw);
+    updateWorkspaceRandom(els.studentDrawResult.textContent || 'READY');
+  }
+
+  function renderWorkspaceTimer(panel){
+    panel.innerHTML = `
+      <div class="workspace-card-title">TIMER</div>
+      <div class="workspace-timer-meta"></div>
+      <div class="workspace-timer-number">--:--</div>
+      <div class="workspace-timer-actions">
+        <button class="pixel-btn pixel-cut workspace-timer-setup" type="button">타이머 설정</button>
+        <button class="pixel-btn pixel-cut workspace-timer-pause" type="button">일시정지</button>
+        <button class="pixel-btn pixel-cut workspace-timer-plus" type="button">+1분</button>
+        <button class="pixel-btn pixel-cut workspace-timer-stop" type="button">종료</button>
+      </div>`;
+    panel.querySelector('.workspace-timer-setup').addEventListener('click', openTimerSetup);
+    panel.querySelector('.workspace-timer-pause').addEventListener('click', pauseResumeTimer);
+    panel.querySelector('.workspace-timer-plus').addEventListener('click', () => adjustTimer(60));
+    panel.querySelector('.workspace-timer-stop').addEventListener('click', () => { stopCurrentTimer(); updateWorkspaceTimer(); });
+    updateWorkspaceTimer();
+  }
+
+  function renderWorkspaceNotice(panel){
+    const notice = persisted.workspaceNotice || {title:'수업 안내', message:'교과서를 펼쳐 주세요.'};
+    const title = document.createElement('div');
+    title.className = 'workspace-card-title'; title.textContent = 'NOTICE';
+    const form = document.createElement('div'); form.className = 'workspace-notice-form';
+    const titleInput = document.createElement('input'); titleInput.type = 'text'; titleInput.maxLength = 30; titleInput.value = notice.title;
+    const messageInput = document.createElement('textarea'); messageInput.maxLength = 180; messageInput.value = notice.message;
+    const saveButton = document.createElement('button'); saveButton.type = 'button'; saveButton.className = 'pixel-btn pixel-cut'; saveButton.textContent = '알림장 저장';
+    saveButton.addEventListener('click', () => {
+      persisted.workspaceNotice = {title:titleInput.value.trim() || '수업 안내', message:messageInput.value.trim() || '교과서를 펼쳐 주세요.'};
+      savePersisted(); showToast('멀티 화면 알림장을 저장했습니다.');
+    });
+    form.append(titleInput, messageInput, saveButton);
+    panel.append(title, form);
+  }
+
+  function renderWorkspaceImage(panel){
+    panel.innerHTML = `
+      <div class="workspace-card-title">CLIPBOARD IMAGE</div>
+      <div class="workspace-image-actions">
+        <button class="pixel-btn pixel-cut workspace-image-paste" type="button">클립보드 붙여넣기</button>
+        <button class="pixel-btn pixel-cut workspace-image-clear" type="button">그림 지우기</button>
+      </div>
+      <div class="workspace-image-board" tabindex="0" role="button" aria-label="클립보드 이미지 붙여넣기 영역"></div>`;
+    const board = panel.querySelector('.workspace-image-board');
+    panel.querySelector('.workspace-image-paste').addEventListener('click',() => pasteWorkspaceImageFromApi(board));
+    panel.querySelector('.workspace-image-clear').addEventListener('click',clearWorkspaceImage);
+    board.addEventListener('click',() => board.focus());
+    board.addEventListener('paste',event => {
+      const image = imageFromClipboardData(event.clipboardData);
+      if(!image){ showToast('클립보드에 그림이 없습니다.'); return; }
+      event.preventDefault();
+      saveWorkspaceImage(image);
+    });
+    showWorkspaceImage(board);
+  }
+
+  function renderWorkspacePanel(panel, type){
+    panel.innerHTML = '';
+    if(type === 'seating') renderWorkspaceSeating(panel);
+    else if(type === 'random') renderWorkspaceRandom(panel);
+    else if(type === 'timer') renderWorkspaceTimer(panel);
+    else if(type === 'notice') renderWorkspaceNotice(panel);
+    else if(type === 'image') renderWorkspaceImage(panel);
+  }
+
+  function renderWorkspace(){
+    const preset = WORKSPACE_PRESETS[persisted.settings.workspacePreset] ? persisted.settings.workspacePreset : 'seating-random';
+    persisted.settings.workspacePreset = preset;
+    els.workspacePresetButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.workspacePreset === preset));
+    const [left, right] = WORKSPACE_PRESETS[preset];
+    renderWorkspacePanel(els.workspacePanelA, left);
+    renderWorkspacePanel(els.workspacePanelB, right);
+  }
+
+  function setWorkspacePreset(preset){
+    if(!WORKSPACE_PRESETS[preset]) return;
+    persisted.settings.workspacePreset = preset;
+    savePersisted();
+    setView('workspace');
+  }
+
+  function openNoticeEditor(){
+    renderRecentNotices();
+    els.noticeEditorOverlay.classList.add('show');
+    setTimeout(() => els.noticeMessageInput.focus(), 50);
+  }
+
+  function showNoticeFromEditor(){
+    const title = els.noticeTitleInput.value.trim() || 'NOTICE';
+    const message = els.noticeMessageInput.value.trim();
+    if(!message){ showToast('안내 문구를 입력해 주세요.'); return; }
+    const notice = {
+      title, message,
+      tone: els.noticeTone.value,
+      duration: Number(els.noticeDuration.value),
+      icon: els.noticeIcon.value
+    };
+    persisted.recentNotices = [notice, ...persisted.recentNotices.filter(n => !(n.title === notice.title && n.message === notice.message))].slice(0,10);
+    persisted.workspaceNotice = {title, message};
+    savePersisted();
+    closeOverlay(els.noticeEditorOverlay);
+    showNoticeDirect(notice);
+  }
+
+  function showNoticeDirect({title='NOTICE', message='', tone='honeydew', duration=5, icon='!'}){
+    clearTimeout(state.noticeTimeout);
+    els.noticeCard.classList.remove('celadon','yellow','dark');
+    if(tone !== 'honeydew') els.noticeCard.classList.add(tone);
+    els.noticeDisplayTitle.textContent = `${icon} ${title}`;
+    els.noticeDisplayMessage.textContent = message;
+    const len = message.length;
+    els.noticeDisplayMessage.style.fontSize = len > 70 ? 'clamp(48px,4.2vw,150px)' : len > 38 ? 'clamp(58px,5vw,180px)' : 'clamp(70px,6vw,220px)';
+    els.noticePin.textContent = duration === 0 ? 'PIN · 계속 표시' : `NOTICE · ${duration} SEC`;
+    els.noticeOverlay.classList.add('show');
+    if(duration > 0) state.noticeTimeout = setTimeout(closeNotice, duration * 1000);
+  }
+
+  function closeNotice(){
+    clearTimeout(state.noticeTimeout);
+    state.noticeTimeout = null;
+    els.noticeOverlay.classList.remove('show');
+  }
+
+  function renderNoticePresets(){
+    els.noticePresets.innerHTML = '';
+    NOTICE_PRESETS.forEach(text => {
+      const b = document.createElement('button'); b.type='button'; b.className='pixel-btn pixel-cut'; b.textContent=text;
+      b.addEventListener('click',()=>{ els.noticeMessageInput.value=text; });
+      els.noticePresets.appendChild(b);
+    });
+  }
+
+  function renderRecentNotices(){
+    els.recentNotices.innerHTML = '';
+    if(!persisted.recentNotices.length){
+      const empty = document.createElement('div'); empty.className='mini-copy'; empty.textContent='최근 사용 문구가 없습니다.'; els.recentNotices.appendChild(empty); return;
+    }
+    persisted.recentNotices.forEach(n => {
+      const b = document.createElement('button'); b.type='button'; b.className='pixel-btn pixel-cut'; b.textContent=n.message.length>20 ? n.message.slice(0,20)+'…' : n.message;
+      b.title = n.message;
+      b.addEventListener('click',()=>{
+        els.noticeTitleInput.value=n.title; els.noticeMessageInput.value=n.message; els.noticeTone.value=n.tone || 'honeydew'; els.noticeDuration.value=String(n.duration ?? 5); els.noticeIcon.value=n.icon || '!';
+      });
+      els.recentNotices.appendChild(b);
+    });
+  }
+
+  function openChoice(title, message, actions){
+    els.choiceTitle.textContent = title;
+    els.choiceMessage.textContent = message;
+    els.choiceActions.innerHTML = '';
+    actions.forEach(({label, action}) => {
+      const b = document.createElement('button'); b.type='button'; b.className='pixel-btn pixel-cut'; b.textContent=label; b.addEventListener('click',action); els.choiceActions.appendChild(b);
+    });
+    els.choiceOverlay.classList.add('show');
+  }
+  function closeChoice(){ closeOverlay(els.choiceOverlay); }
+  function closeOverlay(el){ el.classList.remove('show'); }
+
+  function openSettings(tab='display'){
+    renderSettingsClassButtons();
+    loadSettingsNames(state.settingsClassIndex);
+    switchSettingsTab(tab);
+    applySettings();
+    els.settingsOverlay.classList.add('show');
+  }
+  function closeSettings(){ closeOverlay(els.settingsOverlay); savePersisted(); }
+  function switchSettingsTab(tab){
+    els.settingsTabs.forEach(b => {
+      const active = b.dataset.settingsTab === tab;
+      b.classList.toggle('active',active);
+      b.textContent = (active ? '▶ ' : '') + ({display:'화면·시간',sound:'알림음',message:'기본 문구',classes:'학급 명단',data:'데이터 관리'}[b.dataset.settingsTab]);
+    });
+    els.settingsPanes.forEach(p => p.classList.toggle('active', p.dataset.settingsPane === tab));
+  }
+
+  function renderSettingsClassButtons(){
+    els.settingsClassButtons.innerHTML = '';
+    persisted.classes.forEach((cls,idx)=>{
+      const b=document.createElement('button'); b.type='button'; b.className='class-tab pixel-cut'+(idx===state.settingsClassIndex?' active':''); b.textContent=cls.id;
+      b.addEventListener('click',()=>{ state.settingsClassIndex=idx; renderSettingsClassButtons(); loadSettingsNames(idx); });
+      els.settingsClassButtons.appendChild(b);
+    });
+  }
+  function loadSettingsNames(index){
+    const cls = persisted.classes[index];
+    els.settingsClassTitle.textContent = `${cls.title} 명단`;
+    els.settingsNamesInput.value = cls.names.join('\n');
+    els.settingsNameCount.textContent = `${cls.names.length} / 24`;
+  }
+  function saveSettingsNames(){
+    const cls = persisted.classes[state.settingsClassIndex];
+    cls.names = cleanNames(els.settingsNamesInput.value);
+    delete persisted.seatLayouts[cls.id];
+    delete persisted.studentDrawState[cls.id];
+    savePersisted();
+    loadSettingsNames(state.settingsClassIndex);
+    renderClassTabs(); renderSeats();
+    if(state.settingsClassIndex === state.selectedClassIndex){ renderStudentDraw(); if(state.view === 'workspace') renderWorkspace(); }
+    showToast(`${cls.title} 명단을 저장했습니다.`);
+  }
+  function resetSettingsNames(){
+    const targetId = persisted.classes[state.settingsClassIndex].id;
+    const initial = INITIAL_CLASSES.find(c=>c.id===targetId);
+    persisted.classes[state.settingsClassIndex].names = [...initial.names];
+    delete persisted.seatLayouts[targetId];
+    delete persisted.studentDrawState[targetId];
+    savePersisted(); loadSettingsNames(state.settingsClassIndex); renderSeats();
+    if(state.settingsClassIndex === state.selectedClassIndex){ renderStudentDraw(); if(state.view === 'workspace') renderWorkspace(); }
+    showToast('초기 명단으로 되돌렸습니다.');
+  }
+
+  function exportData(){
+    const blob = new Blob([JSON.stringify(persisted,null,2)],{type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const d = new Date();
+    a.href=url; a.download=`dodam_classroom_backup_${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}.json`;
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),1000);
+    showToast('데이터 파일을 저장했습니다.');
+  }
+
+  function importData(file){
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const data = JSON.parse(reader.result);
+        if(!data || !Array.isArray(data.classes) || data.classes.length !== 9) throw new Error('invalid');
+        Object.assign(persisted, defaultState(), data, {settings:{...defaultState().settings, ...(data.settings||{})}});
+        state.selectedClassIndex = Math.max(0,persisted.classes.findIndex(c=>c.id===persisted.selectedClass));
+        savePersisted(); applySettings(); renderClassTabs(); renderSeats(); renderSettingsClassButtons(); loadSettingsNames(0); renderRecentNotices(); renderStudentDraw(); renderWorkspace();
+        showToast('데이터를 불러왔습니다.');
+      } catch(err){ showToast('올바른 백업 파일이 아닙니다.'); }
+    };
+    reader.readAsText(file);
+  }
+
+  function resetAll(){
+    openChoice('RESET ALL', '모든 설정, 명단, 좌석 배치를 처음 상태로 되돌릴까요?', [
+      {label:'전체 초기화', action:()=>{
+        const fresh = defaultState();
+        Object.keys(persisted).forEach(k=>delete persisted[k]);
+        Object.assign(persisted,fresh);
+        state.selectedClassIndex=0; state.settingsClassIndex=0; state.seatEditMode=false; state.selectedSeatIndex=null; stopCurrentTimer(true); savePersisted(); applySettings(); renderClassTabs(); renderSeats(); renderSettingsClassButtons(); loadSettingsNames(0); renderRecentNotices(); renderStudentDraw(); renderWorkspace(); closeChoice(); showToast('전체 초기화를 완료했습니다.');
+      }},
+      {label:'취소', action:()=>closeChoice()}
+    ]);
+  }
+
+  async function toggleFullscreen(){
+    try {
+      if(!document.fullscreenElement) await document.documentElement.requestFullscreen();
+      else await document.exitFullscreen();
+      await requestWakeLock();
+    } catch(err){ showToast('브라우저 전체화면 또는 F11 키를 사용해 주세요.'); }
+  }
+
+  async function requestWakeLock(){
+    try {
+      if('wakeLock' in navigator){
+        if(state.wakeLock) return;
+        state.wakeLock = await navigator.wakeLock.request('screen');
+        state.wakeLock.addEventListener('release',()=>{ state.wakeLock=null; });
+      }
+    } catch(err){ /* 지원하지 않거나 권한이 없으면 조용히 무시 */ }
+  }
+
+  function toggleSound(){
+    persisted.settings.muted = !persisted.settings.muted;
+    applySettings(); savePersisted();
+    if(!persisted.settings.muted) playStartSound();
+    showToast(persisted.settings.muted ? '사운드를 껐습니다.' : '사운드를 켰습니다.');
+  }
+
+  function renderQuickTimes(){
+    els.quickTimes.innerHTML='';
+    QUICK_TIMES.forEach(sec=>{
+      const b=document.createElement('button'); b.type='button'; b.className='pixel-btn pixel-cut';
+      b.textContent=sec<60?`${sec}초`:`${sec/60}분`;
+      b.addEventListener('click',()=>{ els.customMinutes.value=Math.floor(sec/60); els.customSeconds.value=sec%60; });
+      els.quickTimes.appendChild(b);
+    });
+  }
+
+  function handleDockAction(action){
+    initAudio(); requestWakeLock();
+    switch(action){
+      case 'workspace': setView('workspace'); break;
+      case 'randomPicker': openRandomPicker(); break;
+      case 'customTimer': openTimerSetup(); break;
+      case 'seating': setView('seating'); renderSeats(); break;
+      case 'notice': openNoticeEditor(); break;
+      case 'home': requestHome(); break;
+      case 'fullscreen': toggleFullscreen(); break;
+    }
+  }
+
+  function isTypingTarget(target){
+    return ['INPUT','TEXTAREA','SELECT'].includes(target.tagName) || target.isContentEditable;
+  }
+
+  function bindEvents(){
+    els.dockButtons.forEach(btn=>btn.addEventListener('click',()=>handleDockAction(btn.dataset.action)));
+    els.soundBtn.addEventListener('click',()=>{ initAudio(); toggleSound(); });
+    els.settingsBtn.addEventListener('click',()=>openSettings());
+
+    els.pauseResumeBtn.addEventListener('click',pauseResumeTimer);
+    els.restartTimerBtn.addEventListener('click',restartTimer);
+    els.minusMinuteBtn.addEventListener('click',()=>adjustTimer(-60));
+    els.plusMinuteBtn.addEventListener('click',()=>adjustTimer(60));
+    els.plusTenBtn.addEventListener('click',()=>adjustTimer(10));
+    els.stopTimerBtn.addEventListener('click',()=>{ stopCurrentTimer(); setView('home'); });
+
+    els.cleanupPauseBtn.addEventListener('click',pauseResumeTimer);
+    els.cleanupPrevBtn.addEventListener('click',()=>goCleanupStep(state.cleanup.stepIndex-1));
+    els.cleanupNextBtn.addEventListener('click',()=>goCleanupStep(state.cleanup.stepIndex+1));
+    els.cleanupRestartStepBtn.addEventListener('click',restartTimer);
+    els.cleanupRestartAllBtn.addEventListener('click',()=>goCleanupStep(0));
+    els.cleanupStopBtn.addEventListener('click',()=>{ stopCurrentTimer(); setView('home'); });
+
+    els.shuffleSeatsBtn.addEventListener('click',shuffleSeats);
+    els.moveSeatsBtn.addEventListener('click',toggleSeatEditMode);
+    els.resetLayoutBtn.addEventListener('click',resetCurrentLayout);
+    els.openNamesBtn.addEventListener('click',()=>{ state.settingsClassIndex=state.selectedClassIndex; openSettings('classes'); });
+    els.studentFocusClose.addEventListener('click',closeStudentFocus);
+    els.studentFocus.addEventListener('click',e=>{ if(e.target===els.studentFocus) closeStudentFocus(); });
+    els.drawGroupBtn.addEventListener('click',drawNextGroup);
+    els.resetGroupDrawBtn.addEventListener('click',resetGroupDraw);
+    els.drawStudentBtn.addEventListener('click',drawStudent);
+    els.resetStudentDrawBtn.addEventListener('click',resetStudentDraw);
+    els.closeRandomPickerBtn.addEventListener('click',closeRandomPicker);
+    els.randomPickerOverlay.addEventListener('click',e=>{ if(e.target===els.randomPickerOverlay) closeRandomPicker(); });
+    els.workspacePresetButtons.forEach(btn => btn.addEventListener('click', () => setWorkspacePreset(btn.dataset.workspacePreset)));
+
+    els.miniTimer.addEventListener('click',openTimerViewFromMini);
+    els.miniTimer.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' ') openTimerViewFromMini(); });
+
+    els.closeTimerSetupBtn.addEventListener('click',()=>closeOverlay(els.timerSetupOverlay));
+    els.startCustomTimerBtn.addEventListener('click',startCustomTimer);
+    els.closeNoticeEditorBtn.addEventListener('click',()=>closeOverlay(els.noticeEditorOverlay));
+    els.showNoticeBtn.addEventListener('click',showNoticeFromEditor);
+    els.noticeCloseBtn.addEventListener('click',closeNotice);
+    els.noticeOverlay.addEventListener('click',closeNotice);
+
+    els.settingsTabs.forEach(btn=>btn.addEventListener('click',()=>switchSettingsTab(btn.dataset.settingsTab)));
+    els.closeSettingsBtn.addEventListener('click',closeSettings);
+    els.timeFormatToggle.addEventListener('click',()=>{ persisted.settings.timeFormat=persisted.settings.timeFormat===24?12:24; applySettings(); savePersisted(); });
+    els.secondsToggle.addEventListener('click',()=>{ persisted.settings.showSeconds=!persisted.settings.showSeconds; applySettings(); savePersisted(); });
+    els.contrastToggle.addEventListener('click',()=>{ persisted.settings.highContrast=!persisted.settings.highContrast; applySettings(); savePersisted(); });
+    els.bootToggle.addEventListener('click',()=>{ persisted.settings.showBoot=!persisted.settings.showBoot; applySettings(); savePersisted(); });
+    els.brightnessRange.addEventListener('input',()=>{ persisted.settings.brightness=Number(els.brightnessRange.value); applySettings(); savePersisted(); });
+    els.soundToggle.addEventListener('click',toggleSound);
+    els.volumeRange.addEventListener('input',()=>{ persisted.settings.volume=Number(els.volumeRange.value); if(masterGain) masterGain.gain.value=persisted.settings.volume; if(state.bgmAudio) state.bgmAudio.volume = persisted.settings.volume; savePersisted(); updateMusicUI(); });
+    els.testSoundBtn.addEventListener('click',()=>{ initAudio(); playEndSound(); });
+    els.saveDefaultMessageBtn.addEventListener('click',()=>{ const value=els.defaultMessageInput.value.trim(); if(value){ persisted.settings.defaultMessage=value; persisted.settings.homeMessageMode='custom'; } else { persisted.settings.defaultMessage=HOME_ENGLISH_MESSAGES[0]; persisted.settings.homeMessageMode='randomEnglish'; state.homeMessageIndex=-1; } applySettings(); updateHomeMessage(true); savePersisted(); showToast(value ? '고정 문구를 저장했습니다.' : '영어 랜덤 문구로 설정했습니다.'); });
+    els.settingsNamesInput.addEventListener('input',()=>{ els.settingsNameCount.textContent=`${cleanNames(els.settingsNamesInput.value).length} / 24`; });
+    els.saveNamesBtn.addEventListener('click',saveSettingsNames);
+    els.resetNamesBtn.addEventListener('click',resetSettingsNames);
+    els.copyNamesBtn.addEventListener('click',async()=>{
+      try { await navigator.clipboard.writeText(els.settingsNamesInput.value); showToast('명단을 복사했습니다.'); }
+      catch(err){ els.settingsNamesInput.select(); document.execCommand('copy'); showToast('명단을 복사했습니다.'); }
+    });
+    els.exportDataBtn.addEventListener('click',exportData);
+    els.importDataBtn.addEventListener('click',()=>els.importFileInput.click());
+    els.importFileInput.addEventListener('change',()=>{ const file=els.importFileInput.files?.[0]; if(file) importData(file); els.importFileInput.value=''; });
+    els.clearRecentBtn.addEventListener('click',()=>{ persisted.recentNotices=[]; savePersisted(); renderRecentNotices(); showToast('최근 알림을 삭제했습니다.'); });
+    els.resetAllBtn.addEventListener('click',resetAll);
+
+    [els.timerSetupOverlay,els.noticeEditorOverlay,els.settingsOverlay,els.choiceOverlay].forEach(overlay=>{
+      overlay.addEventListener('click',e=>{ if(e.target===overlay) closeOverlay(overlay); });
+    });
+
+    document.addEventListener('keydown',e=>{
+      if(isTypingTarget(e.target)) return;
+      const k=e.key.toLowerCase();
+      if(e.code==='Space'){
+        if(state.timer.mode){ e.preventDefault(); pauseResumeTimer(); }
+        return;
+      }
+      if(k==='d') openRandomPicker();
+      else if(k==='w') setView('workspace');
+      else if(k==='t') openTimerSetup();
+      else if(k==='s') { setView('seating'); renderSeats(); }
+      else if(k==='a') openNoticeEditor();
+      else if(k==='h') requestHome();
+      else if(k==='f') toggleFullscreen();
+      else if(k==='m') toggleSound();
+      else if(k==='r' && state.timer.mode) restartTimer();
+      else if(e.key==='Escape'){
+        closeNotice(); closeStudentFocus(); closeRandomPicker();
+        [els.timerSetupOverlay,els.noticeEditorOverlay,els.settingsOverlay,els.choiceOverlay].forEach(closeOverlay);
+      }
+      const n=Number(e.key);
+      if(state.view==='seating' && n>=1 && n<=9) switchClass(n-1);
+    });
+
+    document.addEventListener('pointerdown',()=>{ initAudio(); requestWakeLock(); },{once:true});
+    document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible') requestWakeLock(); });
+    els.bootScreen.addEventListener('click',hideBoot);
+  }
+
+  function hideBoot(){
+    els.bootScreen.classList.add('hide');
+    setTimeout(()=>els.bootScreen.classList.add('hidden'),280);
+  }
+
+  function init(){
+    renderQuickTimes();
+    renderNoticePresets();
+    renderRecentNotices();
+    renderClassTabs();
+    renderSeats();
+    renderStudentDraw();
+    renderWorkspace();
+    renderSettingsClassButtons();
+    loadSettingsNames(0);
+    renderMusicButtons();
+    applySettings();
+    updateHomeMessage(true);
+    els.homeClassLabel.textContent = `현재 선택: ${getCurrentClass().id}`;
+    updateClock();
+    bindEvents();
+    tickLoop = setInterval(tickTimer,250);
+    setInterval(updateClock,1000);
+    setInterval(()=>{ if(state.view === 'home' && persisted.settings.homeMessageMode !== 'custom') updateHomeMessage(true); }, 15 * 60 * 1000);
+    if(!persisted.settings.showBoot) hideBoot();
+    else setTimeout(hideBoot,1700);
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>

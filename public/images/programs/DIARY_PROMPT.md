@@ -1,0 +1,7 @@
+# 일기장 그림
+
+도구: 기본 내장 image_gen. 생성일: 2026-11-14. 옵션: transparent_background=true. 파일: diary-v1.png. 일기장 헤더와 허브 카드에 표시한다. 실제 일기·사용자 정보는 프롬프트에 사용하지 않았다.
+
+## 생성 프롬프트
+
+Use case: stylized-concept. Asset type: hero illustration and landscape card cover for a private personal diary web app called Dear Today within Culture Club. Create one original premium tactile pastel 3D clay-and-paper illustration: an open cream-page diary with a soft lavender fabric cover and a coral ribbon bookmark, a lavender and peach pencil laid gently diagonally on the right, a tiny mint mug beside the notebook, little yellow flower and round smiling mood stickers on the edge of the pages, and a small closed periwinkle notebook behind it. The open pages show only a few soft abstract curved writing marks, absolutely no readable personal text. A cozy introspective everyday journaling mood, gently rounded forms, subtle paper fibers, soft glossy highlights, warm delicate lighting. Palette warm cream #fcfaf3, lavender #e9ccff, mint #c9e5d5, butter yellow #ffe895, periwinkle #b4c5e8 and restrained coral #fd9494. Three-quarter isometric view, one cohesive arrangement centered with all objects contained within the middle 80 percent and clear margins, landscape 3:2 composition, readable at small card size and at a 250px header size. Transparent background, no background rectangle, preserve alpha. No globe, travel objects, people, text, letters, typography, UI controls, watermark or logos. Finished beautiful raster artwork, not code.

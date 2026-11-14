@@ -1,0 +1,17 @@
+node_modules/
+dist/
+data/
+.env
+*.tsbuildinfo
+.env.*
+!.env.example
+.firebase/
+*-debug.log
+*firebase-adminsdk*.json
+*service-account*.json
+*.sqlite
+*.sqlite-*
+*.db
+*.db-*
+credentials*.json
+repository-created.jpg
