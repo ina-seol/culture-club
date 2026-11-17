@@ -83,3 +83,6 @@ npm run backup
 - `public/fonts/OFL.txt`: JUA 글꼴 라이선스
 
 실제 수업 전에 교사가 문화 설명과 학년별 영어 난이도를 검토해 주세요.
+
+### 수업제작소 바로가기
+허브의 고정 교사 도구 카드에서 [Lesson Factory](https://ina-seol.github.io/lesson-factory/)를 새 탭으로 엽니다. 공용 프로그램 목록의 초기화 여부와 관계없이 표시되며, 동일 URL의 등록 항목은 중복 표시하지 않습니다. 카드 제목·설명·연결은 `src/main.tsx`, 생성 표지는 `public/images/programs/lesson-factory-v1.jpg`에 있습니다. 고정 카드는 관리실의 공용 목록 편집 대상이 아닙니다.

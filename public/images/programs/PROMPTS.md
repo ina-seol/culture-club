@@ -15,3 +15,7 @@
 표지는 생성한 이미지 파일을 이미지 요소로 표시한다. CSS로 그림을 조립하지 않는다.
 
 원본 생성 이미지를 유지하면서 웹 전송용 JPEG로 인코딩했다. 장면을 코드로 재작성하거나 합성하지 않았다.
+
+## 수업제작소 (2026-11-17)
+기본 내장 image_gen으로 생성. lesson-factory-v1.jpg는 웹 전송용 JPEG.
+Prompt: Landscape 3:2 website card illustration for a Korean teacher's Lesson Factory app. A miniature mint-green lesson-making workshop on a cream tabletop, open lesson planner, worksheets, ABC flashcards, presentation board and dice. Tactile clay and paper illustration, soft warm studio light, cream/mint/lavender/peach, central silhouette and safe crop margins. No people, headings, UI buttons or watermark.
